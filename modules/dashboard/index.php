@@ -330,7 +330,7 @@ require_once ROOT_PATH . '/templates/navbar.php';
     <div class="custom-card-header bg-white py-2 py-md-3 border-bottom site-ops-header">
         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2 w-100">
             <!-- Row 1: Title, Badges & Mobile View Switcher -->
-            <div class="d-flex align-items-center justify-content-between w-100 flex-wrap gap-1.5">
+            <div class="d-flex align-items-center justify-content-between w-100 w-md-auto flex-wrap gap-1.5">
                 <div class="d-flex align-items-center gap-1.5 flex-wrap">
                     <span class="badge bg-danger p-1 rounded-circle animate-pulse"></span>
                     <h6 class="fw-bold mb-0 text-dark site-ops-title" style="font-size: 0.92rem;">Sites & Workforce</h6>
@@ -344,17 +344,17 @@ require_once ROOT_PATH . '/templates/navbar.php';
 
                 <!-- View Switcher on Mobile (compact inline with title) -->
                 <div class="btn-group btn-group-sm site-ops-mobile-view-switcher" role="group">
-                    <button type="button" class="btn btn-xs btn-primary active btn-view-sites py-1 px-2" onclick="switchOpView('sites')" style="font-size: 0.72rem;">
-                        <i class="bi bi-buildings me-0.5"></i> Sites
+                    <button type="button" class="btn btn-xs btn-primary active btn-view-sites py-1 px-2" onclick="switchOpView('sites')" style="font-size: 0.72rem; display: inline-flex; align-items: center; white-space: nowrap; gap: 4px;">
+                        <i class="bi bi-buildings"></i> <span>Sites</span>
                     </button>
-                    <button type="button" class="btn btn-xs btn-outline-secondary btn-view-roster py-1 px-2" onclick="switchOpView('roster')" style="font-size: 0.72rem;">
-                        <i class="bi bi-table me-0.5"></i> Table
+                    <button type="button" class="btn btn-xs btn-outline-secondary btn-view-roster py-1 px-2" onclick="switchOpView('roster')" style="font-size: 0.72rem; display: inline-flex; align-items: center; white-space: nowrap; gap: 4px;">
+                        <i class="bi bi-table"></i> <span>Table</span>
                     </button>
                 </div>
             </div>
 
             <!-- Controls: Mobile Ultra-Compact Calendar Strip VS Desktop Full Bar -->
-            <div class="site-ops-controls">
+            <div class="site-ops-controls flex-shrink-0">
                 <!-- Mobile Ultra-Compact Calendar Bar -->
                 <div class="site-ops-mobile-controls align-items-center gap-1 bg-light p-1 rounded-2 border">
                     <a href="?date=<?= $prevDate ?>" class="btn btn-xs btn-white border px-2 py-1 shadow-2xs" title="Previous Day">
@@ -377,27 +377,27 @@ require_once ROOT_PATH . '/templates/navbar.php';
                 </div>
 
                 <!-- Desktop Date Navigator Bar -->
-                <div class="site-ops-desktop-controls align-items-center gap-2">
-                    <div class="d-flex align-items-center gap-1.5 border rounded-2 p-1 bg-light date-pill-nav shadow-2xs">
-                        <a href="?date=<?= $prevDate ?>" class="btn btn-xs btn-outline-secondary px-2 py-1 bg-white text-dark shadow-2xs" title="Previous Day" style="font-size: 0.74rem; height: 28px; display: inline-flex; align-items: center;">
+                <div class="site-ops-desktop-controls align-items-center gap-2 flex-shrink-0">
+                    <div class="d-flex align-items-center gap-1 border rounded-2 p-1 bg-light date-pill-nav shadow-2xs">
+                        <a href="?date=<?= $prevDate ?>" class="btn btn-xs btn-outline-secondary px-2 py-1 bg-white text-dark shadow-2xs" title="Previous Day" style="font-size: 0.74rem; height: 30px; display: inline-flex; align-items: center; justify-content: center;">
                             <i class="bi bi-chevron-left"></i>
                         </a>
-                        <a href="?date=<?= $today ?>" class="btn btn-xs <?= $isToday ? 'btn-primary text-white fw-bold' : 'btn-outline-primary bg-white' ?> px-2.5 py-1 shadow-2xs" style="font-size: 0.74rem; height: 28px; display: inline-flex; align-items: center;">
+                        <a href="?date=<?= $today ?>" class="btn btn-xs <?= $isToday ? 'btn-primary text-white fw-bold' : 'btn-outline-primary bg-white' ?> px-2.5 py-1 shadow-2xs" style="font-size: 0.74rem; height: 30px; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;">
                             <i class="bi bi-calendar-check me-1"></i> Today
                         </a>
-                        <a href="?date=<?= $nextDate ?>" class="btn btn-xs btn-outline-secondary px-2 py-1 bg-white text-dark shadow-2xs" title="Next Day" style="font-size: 0.74rem; height: 28px; display: inline-flex; align-items: center;">
+                        <a href="?date=<?= $nextDate ?>" class="btn btn-xs btn-outline-secondary px-2 py-1 bg-white text-dark shadow-2xs" title="Next Day" style="font-size: 0.74rem; height: 30px; display: inline-flex; align-items: center; justify-content: center;">
                             <i class="bi bi-chevron-right"></i>
                         </a>
-                        <input type="date" class="form-control form-control-sm py-0 px-2 bg-white border fw-semibold text-dark shadow-2xs" value="<?= $selectedDate ?>" onchange="location.href='?date=' + this.value" style="width: 140px; min-width: 140px; font-size: 0.78rem; height: 28px; border-radius: 6px; cursor: pointer;">
+                        <input type="date" class="form-control form-control-sm py-0 px-2 bg-white border fw-semibold text-dark shadow-2xs" value="<?= $selectedDate ?>" onchange="location.href='?date=' + this.value" style="width: 154px; min-width: 154px; font-size: 0.78rem; height: 30px; border-radius: 6px; cursor: pointer;">
                     </div>
 
                     <!-- Desktop View Switcher -->
-                    <div class="btn-group btn-group-sm shadow-2xs" role="group">
-                        <button type="button" class="btn btn-xs btn-primary active btn-view-sites fw-semibold py-1 px-2.5" id="btnViewSites" onclick="switchOpView('sites')" style="font-size: 0.75rem; height: 28px;">
-                            <i class="bi bi-buildings me-1"></i> Sites (<?= $runningSitesCount ?>)
+                    <div class="btn-group btn-group-sm shadow-2xs flex-shrink-0" role="group">
+                        <button type="button" class="btn btn-xs btn-primary active btn-view-sites fw-semibold px-2.5" id="btnViewSites" onclick="switchOpView('sites')" style="font-size: 0.75rem; height: 30px; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; gap: 5px;">
+                            <i class="bi bi-buildings"></i> <span>Sites (<?= $runningSitesCount ?>)</span>
                         </button>
-                        <button type="button" class="btn btn-xs btn-outline-secondary bg-white fw-semibold py-1 px-2.5" id="btnViewRoster" onclick="switchOpView('roster')" style="font-size: 0.75rem; height: 28px;">
-                            <i class="bi bi-table me-1"></i> Table
+                        <button type="button" class="btn btn-xs btn-outline-secondary btn-view-roster bg-white fw-semibold px-2.5" id="btnViewRoster" onclick="switchOpView('roster')" style="font-size: 0.75rem; height: 30px; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; gap: 5px;">
+                            <i class="bi bi-table"></i> <span>Table</span>
                         </button>
                     </div>
                 </div>
@@ -1051,10 +1051,10 @@ function switchOpView(view) {
         if (rosterContainer) rosterContainer.classList.remove('d-none');
         sitesButtons.forEach(b => {
             b.classList.remove('btn-primary', 'active');
-            b.classList.add('btn-outline-secondary');
+            b.classList.add('btn-outline-secondary', 'bg-white');
         });
         rosterButtons.forEach(b => {
-            b.classList.remove('btn-outline-secondary');
+            b.classList.remove('btn-outline-secondary', 'bg-white');
             b.classList.add('btn-primary', 'active');
         });
     } else {
@@ -1062,10 +1062,10 @@ function switchOpView(view) {
         if (sitesContainer) sitesContainer.classList.remove('d-none');
         rosterButtons.forEach(b => {
             b.classList.remove('btn-primary', 'active');
-            b.classList.add('btn-outline-secondary');
+            b.classList.add('btn-outline-secondary', 'bg-white');
         });
         sitesButtons.forEach(b => {
-            b.classList.remove('btn-outline-secondary');
+            b.classList.remove('btn-outline-secondary', 'bg-white');
             b.classList.add('btn-primary', 'active');
         });
     }

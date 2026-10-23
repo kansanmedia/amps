@@ -704,6 +704,11 @@ body {
 }
 .site-ops-desktop-controls {
     display: flex !important;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+.site-ops-desktop-controls .btn {
+    white-space: nowrap !important;
 }
 
 /* Mobile Ultra-Compact Operations Dashboard */

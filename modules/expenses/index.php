@@ -137,6 +137,20 @@ $staff = $db->query("SELECT id, full_name, staff_code FROM staff WHERE status = 
 
 $totalExpenses = array_sum(array_column($expenses, 'amount'));
 
+// Fetch Staff Payouts (Salary Settlements & Advances)
+$staffPayQuery = "
+    SELECT sp.*, stf.full_name as staff_name, stf.staff_code, stf.phone as staff_phone,
+           fa.account_name, fa.account_type, u.full_name as processed_by_name
+    FROM staff_payments sp
+    JOIN staff stf ON sp.staff_id = stf.id
+    JOIN financial_accounts fa ON sp.account_id = fa.id
+    LEFT JOIN users u ON sp.processed_by = u.id
+    ORDER BY sp.payment_date DESC, sp.id DESC
+";
+$staffPayments = $db->query($staffPayQuery)->fetchAll();
+$totalStaffPayments = array_sum(array_column($staffPayments, 'amount'));
+$totalAllOutflows = $totalExpenses + $totalStaffPayments;
+
 // Compute real-time remaining account balances for the top strip
 $cashBalance = 0.00;
 $bankBalance = 0.00;
@@ -165,11 +179,14 @@ require_once ROOT_PATH . '/templates/navbar.php';
 
 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
     <div>
-        <h4 class="fw-bold mb-1"><i class="bi bi-credit-card-2-back-fill text-primary me-2"></i>Operational Expenses</h4>
-        <p class="text-muted small mb-0">Record travel, food, accommodation, fuel, uniforms, and office costs linked to payment accounts.</p>
+        <h4 class="fw-bold mb-1"><i class="bi bi-credit-card-2-back-fill text-primary me-2"></i>Expenses & Cash Outflows</h4>
+        <p class="text-muted small mb-0">Track company operational overheads, office expenses, and staff salary & advance payouts.</p>
     </div>
-    <div>
-        <button type="button" class="btn btn-primary btn-sm" onclick="openExpenseModal()">
+    <div class="d-flex align-items-center gap-2">
+        <a href="<?= BASE_URL ?>/modules/staff/index.php" class="btn btn-outline-success btn-sm fw-semibold">
+            <i class="bi bi-cash-coin me-1"></i> Disburse Staff Payment
+        </a>
+        <button type="button" class="btn btn-primary btn-sm fw-semibold" onclick="openExpenseModal()">
             <i class="bi bi-plus-lg me-1"></i> Record New Expense
         </button>
     </div>
@@ -179,23 +196,49 @@ require_once ROOT_PATH . '/templates/navbar.php';
     <div class="alert alert-danger py-2 small mb-3"><?= htmlspecialchars($error) ?></div>
 <?php endif; ?>
 
-<!-- Sleek Financial Balance Strip (No Cards) -->
+<!-- Financial Outflow & Balance Strip -->
 <div class="custom-card p-2.5 px-3 mb-4 shadow-2xs border bg-white rounded-3">
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-        <!-- 1. Total Expense -->
+        <!-- 1. Total Operating Expense -->
         <div class="d-flex align-items-center gap-2.5">
             <div class="rounded-circle p-2 bg-danger-subtle text-danger d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; flex-shrink: 0;">
-                <i class="bi bi-wallet2 fs-5"></i>
+                <i class="bi bi-journal-minus fs-5"></i>
             </div>
             <div>
-                <div class="text-muted text-uppercase fw-bold" style="font-size: 0.68rem; letter-spacing: 0.4px;">Total Expenses</div>
+                <div class="text-muted text-uppercase fw-bold" style="font-size: 0.68rem; letter-spacing: 0.4px;">Operating Expenses</div>
                 <div class="fw-bold text-danger fs-6 lh-1 mt-0.5"><?= Helper::formatCurrency($totalExpenses) ?></div>
             </div>
         </div>
 
         <div class="vr bg-secondary opacity-25 d-none d-lg-block" style="height: 30px;"></div>
 
-        <!-- 2. Cash in Hand -->
+        <!-- 2. Staff Wage Disbursements -->
+        <div class="d-flex align-items-center gap-2.5">
+            <div class="rounded-circle p-2 bg-warning-subtle text-warning-emphasis d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; flex-shrink: 0;">
+                <i class="bi bi-cash-coin fs-5"></i>
+            </div>
+            <div>
+                <div class="text-muted text-uppercase fw-bold" style="font-size: 0.68rem; letter-spacing: 0.4px;">Staff Payouts</div>
+                <div class="fw-bold text-dark fs-6 lh-1 mt-0.5"><?= Helper::formatCurrency($totalStaffPayments) ?></div>
+            </div>
+        </div>
+
+        <div class="vr bg-secondary opacity-25 d-none d-lg-block" style="height: 30px;"></div>
+
+        <!-- 3. Total Outflows Combined -->
+        <div class="d-flex align-items-center gap-2.5">
+            <div class="rounded-circle p-2 bg-info-subtle text-info d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; flex-shrink: 0;">
+                <i class="bi bi-arrow-down-circle fs-5"></i>
+            </div>
+            <div>
+                <div class="text-muted text-uppercase fw-bold" style="font-size: 0.68rem; letter-spacing: 0.4px;">Total Cash Outflow</div>
+                <div class="fw-bold text-info-emphasis fs-6 lh-1 mt-0.5"><?= Helper::formatCurrency($totalAllOutflows) ?></div>
+            </div>
+        </div>
+
+        <div class="vr bg-secondary opacity-25 d-none d-lg-block" style="height: 30px;"></div>
+
+        <!-- 4. Cash in Hand -->
         <div class="d-flex align-items-center gap-2.5">
             <div class="rounded-circle p-2 bg-success-subtle text-success d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; flex-shrink: 0;">
                 <i class="bi bi-cash-stack fs-5"></i>
@@ -208,7 +251,7 @@ require_once ROOT_PATH . '/templates/navbar.php';
 
         <div class="vr bg-secondary opacity-25 d-none d-lg-block" style="height: 30px;"></div>
 
-        <!-- 3. Bank Account Balance -->
+        <!-- 5. Bank Balance -->
         <div class="d-flex align-items-center gap-2.5">
             <div class="rounded-circle p-2 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; flex-shrink: 0;">
                 <i class="bi bi-bank fs-5"></i>
@@ -219,24 +262,9 @@ require_once ROOT_PATH . '/templates/navbar.php';
             </div>
         </div>
 
-        <?php if ($upiBalance > 0): ?>
         <div class="vr bg-secondary opacity-25 d-none d-lg-block" style="height: 30px;"></div>
 
-        <!-- 4. UPI Account Balance -->
-        <div class="d-flex align-items-center gap-2.5">
-            <div class="rounded-circle p-2 bg-info-subtle text-info d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; flex-shrink: 0;">
-                <i class="bi bi-qr-code-scan fs-5"></i>
-            </div>
-            <div>
-                <div class="text-muted text-uppercase fw-bold" style="font-size: 0.68rem; letter-spacing: 0.4px;">UPI Balance</div>
-                <div class="fw-bold text-dark fs-6 lh-1 mt-0.5"><?= Helper::formatCurrency($upiBalance) ?></div>
-            </div>
-        </div>
-        <?php endif; ?>
-
-        <div class="vr bg-secondary opacity-25 d-none d-lg-block" style="height: 30px;"></div>
-
-        <!-- 5. Net Available Balance -->
+        <!-- 6. Net Available Balance -->
         <div class="d-flex align-items-center gap-2.5">
             <div class="rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; flex-shrink: 0; background-color: #dcfce7; color: #166534;">
                 <i class="bi bi-shield-check fs-5"></i>
@@ -249,96 +277,203 @@ require_once ROOT_PATH . '/templates/navbar.php';
     </div>
 </div>
 
-<!-- Expense List Table -->
+<!-- Tabs: Operational Expenses vs Staff Salary Payouts -->
 <div class="custom-card">
-    <div class="custom-card-header">
-        <h6 class="fw-bold mb-0">Expense Voucher Ledger</h6>
-        <input type="text" class="form-control form-control-sm" placeholder="Search expense..." data-table-search="#expensesTable" style="width: 220px;">
+    <div class="custom-card-header bg-white border-bottom py-2 d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <ul class="nav nav-tabs card-header-tabs border-bottom-0" id="outflowTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active fw-semibold text-dark py-2 px-3 border-0 border-bottom border-primary border-2" id="tab-expenses-btn" data-bs-toggle="tab" data-bs-target="#pane-expenses" type="button" role="tab" onclick="updateTableSearchTarget('#expensesTable')">
+                    <i class="bi bi-journal-minus me-1.5 text-danger"></i> Operational Expenses
+                    <span class="badge bg-danger-subtle text-danger rounded-pill ms-1"><?= count($expenses) ?></span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link fw-semibold text-secondary py-2 px-3 border-0" id="tab-staff-payouts-btn" data-bs-toggle="tab" data-bs-target="#pane-staff-payouts" type="button" role="tab" onclick="updateTableSearchTarget('#staffPaymentsTable')">
+                    <i class="bi bi-cash-coin me-1.5 text-success"></i> Staff Salary & Advances
+                    <span class="badge bg-success-subtle text-success rounded-pill ms-1"><?= count($staffPayments) ?></span>
+                </button>
+            </li>
+        </ul>
+        <div class="ms-auto">
+            <input type="text" id="outflowTableSearch" class="form-control form-control-sm" placeholder="Search records..." data-table-search="#expensesTable" style="width: 210px;">
+        </div>
     </div>
-    <div class="table-responsive">
-        <table class="table table-custom align-middle" id="expensesTable">
-            <thead>
-                <tr>
-                    <th class="col-row-num text-center">#</th>
-                    <th>Voucher #</th>
-                    <th>Date</th>
-                    <th>Expense Detail</th>
-                    <th>Via</th>
-                    <th>Paid From Account</th>
-                    <th>Cost Tagging</th>
-                    <th class="text-end">Amount</th>
-                    <th class="text-center" style="width: 60px;">Receipt</th>
-                    <th>Entered By</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (empty($expenses)): ?>
-                    <tr><td colspan="10" class="text-center py-4 text-muted">No expenses recorded yet. Click "Record New Expense" above.</td></tr>
-                <?php else: ?>
-                    <?php 
-                        $rowNum = 1;
-                        $sumExpense = 0;
-                        foreach ($expenses as $ex): 
-                            $sumExpense += (float)$ex['amount'];
-                    ?>
+
+    <div class="tab-content" id="outflowTabsContent">
+        <!-- PANE 1: OPERATIONAL EXPENSES -->
+        <div class="tab-pane fade show active" id="pane-expenses" role="tabpanel">
+            <div class="table-responsive">
+                <table class="table table-custom align-middle mb-0" id="expensesTable">
+                    <thead>
                         <tr>
-                            <td class="col-row-num text-center"><?= $rowNum++ ?></td>
-                            <td><strong class="text-dark font-monospace"><?= htmlspecialchars($ex['expense_number']) ?></strong></td>
-                            <td><?= Helper::formatDate($ex['expense_date']) ?></td>
-                            <td>
-                                <div class="fw-semibold text-dark"><?= htmlspecialchars($ex['description']) ?></div>
-                            </td>
-                            <td>
-                                <?php if (!empty($ex['vendor_name'])): ?>
-                                    <span class="badge bg-light text-dark border px-2 py-1"><i class="bi bi-person-fill text-secondary me-1"></i><?= htmlspecialchars($ex['vendor_name']) ?></span>
-                                <?php else: ?>
-                                    <span class="text-muted small">-</span>
-                                <?php endif; ?>
-                            </td>
-                            <td><i class="bi bi-bank text-secondary me-1"></i><?= htmlspecialchars($ex['account_name']) ?></td>
-                            <td>
-                                <?php if ($ex['site_name']): ?>
-                                    <div class="small fw-semibold text-primary"><i class="bi bi-geo-alt"></i> <?= htmlspecialchars($ex['site_name']) ?></div>
-                                <?php elseif ($ex['company_name']): ?>
-                                    <div class="small text-muted"><i class="bi bi-building"></i> <?= htmlspecialchars($ex['company_name']) ?></div>
-                                <?php endif; ?>
-                                <?php if ($ex['staff_name']): ?>
-                                    <div class="small text-secondary"><i class="bi bi-person"></i> <?= htmlspecialchars($ex['staff_name']) ?></div>
-                                <?php endif; ?>
-                                <?php if (!$ex['site_name'] && !$ex['company_name'] && !$ex['staff_name']): ?>
-                                    <span class="text-muted small">General Overhead</span>
-                                <?php endif; ?>
-                            </td>
-                            <td class="text-end font-monospace"><strong class="text-danger"><?= Helper::formatCurrency($ex['amount']) ?></strong></td>
-                            <td class="text-center">
-                                <?php if (!empty($ex['receipt_image'])): ?>
-                                    <a href="<?= BASE_URL ?>/<?= htmlspecialchars($ex['receipt_image']) ?>" target="_blank" class="btn btn-xs btn-outline-secondary px-1.5 py-0.5" title="View Bill">
-                                        <i class="bi bi-paperclip"></i>
-                                    </a>
-                                <?php else: ?>
-                                    <span class="text-muted">-</span>
-                                <?php endif; ?>
-                            </td>
-                            <td><small class="text-muted"><?= htmlspecialchars($ex['created_by_name'] ?? 'Staff') ?></small></td>
+                            <th class="col-row-num text-center">#</th>
+                            <th>Voucher #</th>
+                            <th>Date</th>
+                            <th>Expense Detail</th>
+                            <th>Via</th>
+                            <th>Paid From Account</th>
+                            <th>Cost Tagging</th>
+                            <th class="text-end">Amount</th>
+                            <th class="text-center" style="width: 60px;">Receipt</th>
+                            <th>Entered By</th>
                         </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </tbody>
-            <?php if (!empty($expenses)): ?>
-            <tfoot>
-                <tr class="fw-bold">
-                    <td class="col-row-num text-center">&Sigma;</td>
-                    <td colspan="6" class="text-uppercase text-muted" style="font-size: 0.72rem;">
-                        Expense Ledger Total: <strong><?= count($expenses) ?></strong> Vouchers
-                    </td>
-                    <td class="text-end font-monospace text-danger" style="font-size: 0.82rem; background-color: #fef2f2;">
-                        <?= Helper::formatCurrency($sumExpense) ?>
-                    </td>
-                    <td colspan="2" class="text-muted small">Net Outflow</td>
-                </tr>
-            </tfoot>
-            <?php endif; ?>
-        </table>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($expenses)): ?>
+                            <tr><td colspan="10" class="text-center py-4 text-muted">No operational expenses recorded yet. Click "Record New Expense" above.</td></tr>
+                        <?php else: ?>
+                            <?php 
+                                $rowNum = 1;
+                                $sumExpense = 0;
+                                foreach ($expenses as $ex): 
+                                    $sumExpense += (float)$ex['amount'];
+                            ?>
+                                <tr>
+                                    <td class="col-row-num text-center"><?= $rowNum++ ?></td>
+                                    <td><strong class="text-dark font-monospace"><?= htmlspecialchars($ex['expense_number']) ?></strong></td>
+                                    <td><?= Helper::formatDate($ex['expense_date']) ?></td>
+                                    <td>
+                                        <div class="fw-semibold text-dark"><?= htmlspecialchars($ex['description']) ?></div>
+                                    </td>
+                                    <td>
+                                        <?php if (!empty($ex['vendor_name'])): ?>
+                                            <span class="badge bg-light text-dark border px-2 py-1"><i class="bi bi-person-fill text-secondary me-1"></i><?= htmlspecialchars($ex['vendor_name']) ?></span>
+                                        <?php else: ?>
+                                            <span class="text-muted small">-</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td><i class="bi bi-bank text-secondary me-1"></i><?= htmlspecialchars($ex['account_name']) ?></td>
+                                    <td>
+                                        <?php if ($ex['site_name']): ?>
+                                            <div class="small fw-semibold text-primary"><i class="bi bi-geo-alt"></i> <?= htmlspecialchars($ex['site_name']) ?></div>
+                                        <?php elseif ($ex['company_name']): ?>
+                                            <div class="small text-muted"><i class="bi bi-building"></i> <?= htmlspecialchars($ex['company_name']) ?></div>
+                                        <?php endif; ?>
+                                        <?php if ($ex['staff_name']): ?>
+                                            <div class="small text-secondary"><i class="bi bi-person"></i> <?= htmlspecialchars($ex['staff_name']) ?></div>
+                                        <?php endif; ?>
+                                        <?php if (!$ex['site_name'] && !$ex['company_name'] && !$ex['staff_name']): ?>
+                                            <span class="text-muted small">General Overhead</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="text-end font-monospace"><strong class="text-danger"><?= Helper::formatCurrency($ex['amount']) ?></strong></td>
+                                    <td class="text-center">
+                                        <?php if (!empty($ex['receipt_image'])): ?>
+                                            <a href="<?= BASE_URL ?>/<?= htmlspecialchars($ex['receipt_image']) ?>" target="_blank" class="btn btn-xs btn-outline-secondary px-1.5 py-0.5" title="View Bill">
+                                                <i class="bi bi-paperclip"></i>
+                                            </a>
+                                        <?php else: ?>
+                                            <span class="text-muted">-</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td><small class="text-muted"><?= htmlspecialchars($ex['created_by_name'] ?? 'Staff') ?></small></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                    <?php if (!empty($expenses)): ?>
+                    <tfoot>
+                        <tr class="fw-bold">
+                            <td class="col-row-num text-center">&Sigma;</td>
+                            <td colspan="6" class="text-uppercase text-muted" style="font-size: 0.72rem;">
+                                Expense Ledger Total: <strong><?= count($expenses) ?></strong> Vouchers
+                            </td>
+                            <td class="text-end font-monospace text-danger" style="font-size: 0.82rem; background-color: #fef2f2;">
+                                <?= Helper::formatCurrency($sumExpense) ?>
+                            </td>
+                            <td colspan="2" class="text-muted small">Net Overhead</td>
+                        </tr>
+                    </tfoot>
+                    <?php endif; ?>
+                </table>
+            </div>
+        </div>
+
+        <!-- PANE 2: STAFF SALARY & ADVANCE PAYOUTS -->
+        <div class="tab-pane fade" id="pane-staff-payouts" role="tabpanel">
+            <div class="table-responsive">
+                <table class="table table-custom align-middle mb-0" id="staffPaymentsTable">
+                    <thead>
+                        <tr>
+                            <th class="col-row-num text-center">#</th>
+                            <th>Voucher #</th>
+                            <th>Payment Date</th>
+                            <th>Staff Member</th>
+                            <th>Payment Type</th>
+                            <th>Payment Mode</th>
+                            <th>Paid From Account</th>
+                            <th>Ref # / Notes</th>
+                            <th class="text-end">Amount Disbursed</th>
+                            <th>Processed By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($staffPayments)): ?>
+                            <tr><td colspan="10" class="text-center py-4 text-muted">No staff salary or advance payments recorded yet.</td></tr>
+                        <?php else: ?>
+                            <?php 
+                                $spRowNum = 1;
+                                $sumSp = 0;
+                                foreach ($staffPayments as $sp): 
+                                    $sumSp += (float)$sp['amount'];
+                                    $typeBadge = match($sp['payment_type']) {
+                                        'salary_settlement' => 'bg-success-subtle text-success border border-success-subtle',
+                                        'advance' => 'bg-warning-subtle text-warning-emphasis border border-warning-subtle',
+                                        'incentive' => 'bg-info-subtle text-info border border-info-subtle',
+                                        default => 'bg-secondary-subtle text-secondary'
+                                    };
+                                    $typeLabel = match($sp['payment_type']) {
+                                        'salary_settlement' => 'Salary Settlement',
+                                        'advance' => 'Advance Payout',
+                                        'incentive' => 'Incentive',
+                                        default => ucfirst($sp['payment_type'])
+                                    };
+                            ?>
+                                <tr>
+                                    <td class="col-row-num text-center"><?= $spRowNum++ ?></td>
+                                    <td><strong class="text-dark font-monospace"><?= htmlspecialchars($sp['payment_number']) ?></strong></td>
+                                    <td><?= Helper::formatDate($sp['payment_date']) ?></td>
+                                    <td>
+                                        <div class="fw-bold text-dark"><?= htmlspecialchars($sp['staff_name']) ?></div>
+                                        <span class="badge bg-light text-secondary border font-monospace" style="font-size: 0.65rem;"><?= htmlspecialchars($sp['staff_code']) ?></span>
+                                    </td>
+                                    <td><span class="badge <?= $typeBadge ?> px-2 py-0.5 fw-semibold"><?= $typeLabel ?></span></td>
+                                    <td><span class="badge bg-light text-dark border text-uppercase" style="font-size: 0.68rem;"><?= htmlspecialchars($sp['payment_mode']) ?></span></td>
+                                    <td><i class="bi bi-bank text-secondary me-1"></i><?= htmlspecialchars($sp['account_name']) ?></td>
+                                    <td>
+                                        <?php if (!empty($sp['reference_number'])): ?>
+                                            <div class="small font-monospace text-muted">Ref: <?= htmlspecialchars($sp['reference_number']) ?></div>
+                                        <?php endif; ?>
+                                        <?php if (!empty($sp['notes'])): ?>
+                                            <div class="small text-secondary"><?= htmlspecialchars($sp['notes']) ?></div>
+                                        <?php endif; ?>
+                                        <?php if (empty($sp['reference_number']) && empty($sp['notes'])): ?>
+                                            <span class="text-muted small">-</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="text-end font-monospace"><strong class="text-danger"><?= Helper::formatCurrency($sp['amount']) ?></strong></td>
+                                    <td><small class="text-muted"><?= htmlspecialchars($sp['processed_by_name'] ?? 'Admin') ?></small></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                    <?php if (!empty($staffPayments)): ?>
+                    <tfoot>
+                        <tr class="fw-bold">
+                            <td class="col-row-num text-center">&Sigma;</td>
+                            <td colspan="7" class="text-uppercase text-muted" style="font-size: 0.72rem;">
+                                Staff Payouts Total: <strong><?= count($staffPayments) ?></strong> Vouchers
+                            </td>
+                            <td class="text-end font-monospace text-danger" style="font-size: 0.82rem; background-color: #fef2f2;">
+                                <?= Helper::formatCurrency($sumSp) ?>
+                            </td>
+                            <td class="text-muted small">Disbursed</td>
+                        </tr>
+                    </tfoot>
+                    <?php endif; ?>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -439,6 +574,15 @@ require_once ROOT_PATH . '/templates/navbar.php';
 const expenseModal = new bootstrap.Modal(document.getElementById('expenseModal'));
 function openExpenseModal() {
     expenseModal.show();
+}
+
+function updateTableSearchTarget(targetSelector) {
+    const searchInput = document.getElementById('outflowTableSearch');
+    if (searchInput) {
+        searchInput.setAttribute('data-table-search', targetSelector);
+        searchInput.value = '';
+        document.querySelectorAll('#expensesTable tbody tr, #staffPaymentsTable tbody tr').forEach(tr => tr.style.display = '');
+    }
 }
 </script>
 
