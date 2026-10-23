@@ -106,12 +106,12 @@ require_once ROOT_PATH . '/templates/navbar.php';
 
         <!-- Right Group: Clean Search Filter (Aligned & Compact) -->
         <div class="d-flex align-items-center gap-2 flex-nowrap ms-auto">
-            <button type="button" class="btn btn-xs btn-outline-primary bg-white rounded-2 px-2.5 py-1 shadow-2xs text-nowrap d-flex align-items-center gap-1.5 fw-bold" id="toggleMultiSelectBtn" onclick="toggleMultiSelectMode()" style="font-size: 0.72rem; height: 28px;" title="Multi-Select Mode: Click cells to select (or hold Ctrl / Shift + Click like Excel)">
-                <i class="bi bi-check2-square"></i> <span id="multiSelectBtnText">Multi-Select</span>
+            <button type="button" class="btn btn-xs btn-primary active rounded-2 px-2.5 py-1 shadow-2xs text-nowrap d-flex align-items-center gap-1.5 fw-bold" id="toggleMultiSelectBtn" onclick="toggleMultiSelectMode()" style="font-size: 0.72rem; height: 28px;" title="Multi-Select Mode: Click or drag to select cells">
+                <i class="bi bi-check2-square"></i> <span id="multiSelectBtnText">Multi-Select (ON)</span>
             </button>
-            <div class="position-relative" style="width: 175px;">
+            <div class="position-relative" style="width: 185px;">
                 <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-2 text-muted" style="font-size: 0.72rem; pointer-events: none;"></i>
-                <input type="text" id="staffFilterSearch" class="form-control form-control-sm ps-4 pe-4 py-1 rounded-2" placeholder="Filter staff..." oninput="applyFilters()" style="font-size: 0.73rem; height: 28px;">
+                <input type="text" id="staffFilterSearch" class="form-control form-control-sm ps-4 pe-4 py-1 rounded-2" placeholder="Filter staff... (Press F)" title="Press 'F' key anywhere to search staff" oninput="applyFilters()" style="font-size: 0.73rem; height: 28px;">
                 <button type="button" class="btn btn-link text-muted position-absolute top-50 end-0 translate-middle-y me-1 p-0 d-none" id="clearStaffSearchBtn" onclick="clearStaffSearch()" style="font-size: 0.75rem; text-decoration: none; line-height: 1;" title="Clear filter">
                     <i class="bi bi-x-circle-fill"></i>
                 </button>
@@ -210,8 +210,8 @@ require_once ROOT_PATH . '/templates/navbar.php';
 
 </div>
 
-<!-- 3. FLOATING CELL ACTION MENU (CONTEXT POPOVER ON CELL CLICK) -->
-<div class="cell-action-popover" id="cellActionPopover">
+<!-- 3. FLOATING CELL ACTION MENU (CONTEXT POPOVER ON CELL CLICK - DISABLED PER USER REQUEST) -->
+<div class="cell-action-popover" id="cellActionPopover" style="display: none !important;">
     <div class="d-flex align-items-center justify-content-between border-bottom pb-1.5 mb-2">
         <div class="overflow-hidden">
             <div class="fw-bold text-dark text-truncate" id="popoverStaffName" style="font-size: 0.85rem;">Staff Name</div>
@@ -724,7 +724,7 @@ let matrixData = { staff: [], sites: [], shifts: [], groups: [] };
 let activeGroupsList = [];
 let activeLeaveModal = null;
 let activeBatchDeployModal = null;
-let multiSelectMode = false;
+let multiSelectMode = true; // Enabled by default per user request
 let selectedStaffIds = new Set();
 let selectedVenueSiteId = null;
 let selectedVenueClientId = null;
@@ -738,6 +738,10 @@ document.addEventListener('DOMContentLoaded', () => {
     activeLeaveModal = new bootstrap.Modal(document.getElementById('staffLeaveModal'));
     activeBatchDeployModal = new bootstrap.Modal(document.getElementById('batchDeployModal'));
     
+    // Ensure canvas has multi-select styling active
+    const canvas = document.getElementById('excelMatrixCanvas');
+    if (canvas) canvas.classList.add('multi-select-active');
+
     // Close popover, right-click context menu, and group header menu when clicking outside
     document.addEventListener('click', (e) => {
         const popover = document.getElementById('cellActionPopover');
@@ -766,15 +770,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Close menus or clear selection on Escape key
+    // Global keyboard shortcuts (F: activate search filter, Escape: blur/clear)
     document.addEventListener('keydown', (e) => {
+        const activeEl = document.activeElement;
+        const isInput = activeEl && (
+            activeEl.tagName === 'INPUT' || 
+            activeEl.tagName === 'TEXTAREA' || 
+            activeEl.tagName === 'SELECT' || 
+            activeEl.isContentEditable
+        );
+
+        // Press 'F' or 'f' to immediately focus & select filter/search bar (unless already typing in another input)
+        if ((e.key === 'f' || e.key === 'F') && !e.altKey) {
+            if (!isInput || e.ctrlKey || e.metaKey) {
+                e.preventDefault();
+                const searchInput = document.getElementById('staffFilterSearch');
+                if (searchInput) {
+                    searchInput.focus();
+                    searchInput.select();
+                }
+                return;
+            }
+        }
+
+        // Close menus or clear selection on Escape key
         if (e.key === 'Escape') {
             closeContextMenu();
             closeCellPopover();
             closeGhMenu();
-            if (multiSelectMode) {
-                toggleMultiSelectMode();
-            } else if (selectedStaffIds.size > 0) {
+            const searchInput = document.getElementById('staffFilterSearch');
+            if (activeEl === searchInput) {
+                searchInput.blur();
+            }
+            if (selectedStaffIds.size > 0) {
                 clearStaffSelection();
             }
         }
@@ -1591,90 +1619,18 @@ async function unassignStaff(e, deployId) {
     });
 }
 
-// 10. Click Popover Action Manager
+// 10. Click Popover Action Manager (Disabled per user request)
 function openCellPopover(e, staffId) {
     if (e && e.stopPropagation) e.stopPropagation();
-    closeContextMenu();
-    const staff = matrixData.staff.find(s => s.id === staffId);
-    if (!staff) return;
-
-    activePopoverStaffId = staffId;
-    const popover = document.getElementById('cellActionPopover');
-    if (!popover) return;
-    
-    document.getElementById('popoverStaffName').innerText = staff.name;
-    document.getElementById('popoverStaffMeta').innerText = `${staff.code} • ${staff.category} [${staff.group || 'GENERAL POOL'}]`;
-    
-    // Populate Group Dropdown for 1-click group shift
-    populateGroupOptions(staff.group || 'GENERAL POOL');
-
-    // Deployed vs Unassigned state
-    const assignSection = document.getElementById('popoverAssignSection');
-    const unassignSection = document.getElementById('popoverUnassignSection');
-    const toggleBtn = document.getElementById('popoverToggleAvailBtn');
-    const shiftsListContainer = document.getElementById('popoverShiftsList');
-    const assignTitle = document.getElementById('popoverAssignTitle');
-    const assignBtnText = document.getElementById('popoverAssignBtnText');
-
-    if (staff.is_deployed && staff.shifts && staff.shifts.length > 0) {
-        unassignSection.classList.remove('d-none');
-        assignSection.classList.remove('d-none'); // Allow adding another shift!
-        if (assignTitle) assignTitle.innerText = '+ Add Another Shift / Venue';
-        if (assignBtnText) assignBtnText.innerText = 'Assign Additional Shift';
-
-        // Populate assigned shifts list
-        if (shiftsListContainer) {
-            shiftsListContainer.innerHTML = staff.shifts.map(sh => {
-                const badgeClass = (sh.state === 'completed') ? 'bg-primary text-white' : ((sh.state === 'ongoing') ? 'bg-success text-white' : 'bg-warning text-dark');
-                return `
-                    <div class="d-flex align-items-center justify-content-between p-1.5 bg-light border rounded" style="font-size: 0.72rem;">
-                        <div class="overflow-hidden pe-1">
-                            <div class="d-flex align-items-center gap-1">
-                                <span class="badge ${badgeClass} py-0 px-1 font-monospace" style="font-size: 0.58rem;">${escapeHtml(sh.label)}</span>
-                                <strong class="text-truncate">${escapeHtml(sh.shift_name)}</strong>
-                            </div>
-                            <div class="text-muted text-truncate" style="font-size: 0.66rem;">${escapeHtml(sh.site_name)} (${escapeHtml(sh.client_name)})</div>
-                        </div>
-                        <button type="button" class="btn btn-xs btn-outline-danger py-0 px-1" title="Unassign ${escapeHtml(sh.shift_name)}" onclick="unassignStaff(event, ${sh.deploy_id})">
-                            <i class="bi bi-x-lg"></i>
-                        </button>
-                    </div>
-                `;
-            }).join('');
-        }
-    } else {
-        unassignSection.classList.add('d-none');
-        assignSection.classList.remove('d-none');
-        if (assignTitle) assignTitle.innerText = 'Deploy to Venue';
-        if (assignBtnText) assignBtnText.innerText = 'Deploy Staff';
-    }
-
-    if (staff.is_on_leave) {
-        toggleBtn.innerHTML = `<i class="bi bi-play-circle me-1"></i> Reactivate (Mark Available)`;
-    } else {
-        toggleBtn.innerHTML = `<i class="bi bi-pause-circle me-1"></i> 1-Click Toggle Unavailable`;
-    }
-
-    // Locate cell element directly by ID
-    const cell = document.getElementById(`cell-staff-${staffId}`);
-    if (!cell) return;
-    const rect = cell.getBoundingClientRect();
-    let left = rect.left + window.scrollX;
-    let top = rect.bottom + window.scrollY + 4;
-
-    // Prevent offscreen
-    if (left + 275 > window.innerWidth) {
-        left = window.innerWidth - 285;
-    }
-
-    popover.style.left = `${left}px`;
-    popover.style.top = `${top}px`;
-    popover.style.display = 'block';
+    return; // Popup removed per user request
 }
 
 function closeCellPopover() {
     const popover = document.getElementById('cellActionPopover');
-    if (popover) popover.style.display = 'none';
+    if (popover) {
+        popover.classList.remove('show');
+        popover.style.display = 'none';
+    }
     activePopoverStaffId = null;
 }
 
@@ -2299,7 +2255,8 @@ function formatDateMedium(dStr) {
 let lastSelectedStaffId = null;
 let isMouseDraggingSelection = false;
 let dragSelectionTargetState = true;
-let justMouseSelectedStaffId = null;
+let mouseDownHandledStaffId = null;
+let dragHasMoved = false;
 
 // Toggle Multi-Select Mode button in toolbar
 function toggleMultiSelectMode() {
@@ -2348,6 +2305,7 @@ function handleStaffCellMouseDown(e, staffId) {
 
     const isCtrl = e.ctrlKey || e.metaKey;
     if (!multiSelectMode && !isCtrl) return;
+    if (e.shiftKey) return; // Shift + click handled in handleStaffCellClick
 
     const stf = matrixData.staff ? matrixData.staff.find(s => s.id === staffId) : null;
     if (!stf || stf.is_on_leave || stf.is_deployed) return;
@@ -2356,6 +2314,7 @@ function handleStaffCellMouseDown(e, staffId) {
     e.preventDefault();
 
     isMouseDraggingSelection = true;
+    dragHasMoved = false;
     dragSelectionTargetState = !selectedStaffIds.has(staffId);
 
     if (dragSelectionTargetState) {
@@ -2363,9 +2322,7 @@ function handleStaffCellMouseDown(e, staffId) {
     } else {
         unselectStaff(staffId);
     }
-    justMouseSelectedStaffId = staffId;
-    setTimeout(() => { justMouseSelectedStaffId = null; }, 150);
-
+    mouseDownHandledStaffId = staffId;
     lastSelectedStaffId = staffId;
     updateFloatingBar();
 }
@@ -2381,6 +2338,7 @@ function handleStaffCellMouseEnter(e, staffId) {
     const stf = matrixData.staff ? matrixData.staff.find(s => s.id === staffId) : null;
     if (!stf || stf.is_on_leave || stf.is_deployed) return;
 
+    dragHasMoved = true;
     if (dragSelectionTargetState) {
         selectStaff(staffId);
     } else {
@@ -2390,38 +2348,28 @@ function handleStaffCellMouseEnter(e, staffId) {
     updateFloatingBar();
 }
 
-// Click handler for a staff cell (Excel-style multi-select & popover)
+// Click handler for a staff cell (Excel-style multi-select & click toggle)
 function handleStaffCellClick(e, staffId) {
-    if (justMouseSelectedStaffId === staffId) {
-        return; // Already processed by mousedown
-    }
-
     closeContextMenu();
     closeGhMenu();
+    closeCellPopover();
 
-    const stf = matrixData.staff ? matrixData.staff.find(s => s.id === staffId) : null;
-    if (!stf) return;
-
-    // Excel Selection Trigger:
-    // 1) Multi-select mode is active via ribbon button
-    // 2) Ctrl or Cmd key is held down
-    // 3) Shift key is held down (range select)
-    const isCtrl = e.ctrlKey || e.metaKey;
-    const isShift = e.shiftKey;
-    const isMultiSelectAction = multiSelectMode || isCtrl || isShift;
-
-    if (!isMultiSelectAction) {
-        // Normal single click without modifier:
-        if (selectedStaffIds.size > 0 && !selectedStaffIds.has(staffId)) {
-            clearStaffSelection();
-        }
-        openCellPopover(e, staffId);
+    // If mouse was dragged across multiple cells, suppress click on the drop cell
+    if (dragHasMoved) {
+        dragHasMoved = false;
+        mouseDownHandledStaffId = null;
         return;
     }
 
-    // Handled as multi-selection:
-    e.stopPropagation();
-    closeCellPopover();
+    // If this cell was already toggled during mousedown, do not double-toggle
+    if (mouseDownHandledStaffId === staffId) {
+        mouseDownHandledStaffId = null;
+        return;
+    }
+    mouseDownHandledStaffId = null;
+
+    const stf = matrixData.staff ? matrixData.staff.find(s => s.id === staffId) : null;
+    if (!stf) return;
 
     if (stf.is_on_leave) {
         showToast(`${stf.name} is on leave and cannot be selected for deployment.`, 'warning');
@@ -2432,7 +2380,9 @@ function handleStaffCellClick(e, staffId) {
         return;
     }
 
-    if (isShift && lastSelectedStaffId && lastSelectedStaffId !== staffId) {
+    e.stopPropagation();
+
+    if (e.shiftKey && lastSelectedStaffId && lastSelectedStaffId !== staffId) {
         handleRangeSelection(lastSelectedStaffId, staffId);
     } else {
         toggleStaffSelection(staffId);
