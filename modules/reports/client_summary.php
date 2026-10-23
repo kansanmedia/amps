@@ -212,7 +212,8 @@ require_once ROOT_PATH . '/templates/navbar.php';
 
 <script>
 function downloadFinancialPDF() {
-    downloadElementAsPDF('financial-statement-container', 'Kansan_Financial_Statement_<?= date('Y-m-d') ?>', {
+    const compSlug = '<?= preg_replace('/[^a-zA-Z0-9_-]/', '_', Helper::getCompanyName()) ?>';
+    downloadElementAsPDF('financial-statement-container', compSlug + '_Financial_Statement_<?= date('Y-m-d') ?>', {
         margin: [8, 8, 8, 8],
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
     });

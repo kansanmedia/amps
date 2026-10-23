@@ -12,12 +12,12 @@ class DeploymentService {
         $stmt = $db->prepare("
             SELECT * FROM staff_leaves
             WHERE staff_id = :stfid 
-              AND start_date <= :dt 
-              AND end_date >= :dt 
+              AND start_date <= :dt1 
+              AND end_date >= :dt2 
               AND status = 'active'
             ORDER BY id DESC LIMIT 1
         ");
-        $stmt->execute([':stfid' => $staffId, ':dt' => $date]);
+        $stmt->execute([':stfid' => $staffId, ':dt1' => $date, ':dt2' => $date]);
         $leave = $stmt->fetch();
         return $leave ?: null;
     }
@@ -31,11 +31,11 @@ class DeploymentService {
             SELECT sl.*, s.full_name as staff_name, s.staff_code
             FROM staff_leaves sl
             JOIN staff s ON sl.staff_id = s.id
-            WHERE sl.start_date <= :dt 
-              AND sl.end_date >= :dt 
+            WHERE sl.start_date <= :dt1 
+              AND sl.end_date >= :dt2 
               AND sl.status = 'active'
         ");
-        $stmt->execute([':dt' => $date]);
+        $stmt->execute([':dt1' => $date, ':dt2' => $date]);
         $rows = $stmt->fetchAll();
         $leavesByStaff = [];
         foreach ($rows as $r) {
@@ -132,10 +132,10 @@ class DeploymentService {
             SELECT client_billing_rate 
             FROM rate_cards 
             WHERE client_id = :cid AND site_id = :sid AND shift_id = :shid AND staff_id = :stfid
-              AND effective_from <= :dt AND (effective_to IS NULL OR effective_to >= :dt)
+              AND effective_from <= :dt1 AND (effective_to IS NULL OR effective_to >= :dt2)
             ORDER BY id DESC LIMIT 1
         ");
-        $stmt->execute([':cid' => $clientId, ':sid' => $siteId, ':shid' => $shiftId, ':stfid' => $staffId, ':dt' => $date]);
+        $stmt->execute([':cid' => $clientId, ':sid' => $siteId, ':shid' => $shiftId, ':stfid' => $staffId, ':dt1' => $date, ':dt2' => $date]);
         if ($row = $stmt->fetch()) {
             return [
                 'client_rate' => (float)$row['client_billing_rate'],
@@ -149,10 +149,10 @@ class DeploymentService {
             SELECT client_billing_rate 
             FROM rate_cards 
             WHERE client_id = :cid AND staff_id = :stfid AND site_id IS NULL AND shift_id IS NULL
-              AND effective_from <= :dt AND (effective_to IS NULL OR effective_to >= :dt)
+              AND effective_from <= :dt1 AND (effective_to IS NULL OR effective_to >= :dt2)
             ORDER BY id DESC LIMIT 1
         ");
-        $stmt->execute([':cid' => $clientId, ':stfid' => $staffId, ':dt' => $date]);
+        $stmt->execute([':cid' => $clientId, ':stfid' => $staffId, ':dt1' => $date, ':dt2' => $date]);
         if ($row = $stmt->fetch()) {
             return [
                 'client_rate' => (float)$row['client_billing_rate'],
@@ -167,10 +167,10 @@ class DeploymentService {
                 SELECT client_billing_rate 
                 FROM rate_cards 
                 WHERE client_id = :cid AND category_id = :catid AND site_id = :sid AND shift_id = :shid AND staff_id IS NULL
-                  AND effective_from <= :dt AND (effective_to IS NULL OR effective_to >= :dt)
+                  AND effective_from <= :dt1 AND (effective_to IS NULL OR effective_to >= :dt2)
                 ORDER BY id DESC LIMIT 1
             ");
-            $stmt->execute([':cid' => $clientId, ':catid' => $categoryId, ':sid' => $siteId, ':shid' => $shiftId, ':dt' => $date]);
+            $stmt->execute([':cid' => $clientId, ':catid' => $categoryId, ':sid' => $siteId, ':shid' => $shiftId, ':dt1' => $date, ':dt2' => $date]);
             if ($row = $stmt->fetch()) {
                 return [
                     'client_rate' => (float)$row['client_billing_rate'],
@@ -184,10 +184,10 @@ class DeploymentService {
                 SELECT client_billing_rate 
                 FROM rate_cards 
                 WHERE client_id = :cid AND category_id = :catid AND shift_id = :shid AND site_id IS NULL AND staff_id IS NULL
-                  AND effective_from <= :dt AND (effective_to IS NULL OR effective_to >= :dt)
+                  AND effective_from <= :dt1 AND (effective_to IS NULL OR effective_to >= :dt2)
                 ORDER BY id DESC LIMIT 1
             ");
-            $stmt->execute([':cid' => $clientId, ':catid' => $categoryId, ':shid' => $shiftId, ':dt' => $date]);
+            $stmt->execute([':cid' => $clientId, ':catid' => $categoryId, ':shid' => $shiftId, ':dt1' => $date, ':dt2' => $date]);
             if ($row = $stmt->fetch()) {
                 return [
                     'client_rate' => (float)$row['client_billing_rate'],
@@ -201,10 +201,10 @@ class DeploymentService {
                 SELECT client_billing_rate 
                 FROM rate_cards 
                 WHERE client_id = :cid AND category_id = :catid AND site_id = :sid AND shift_id IS NULL AND staff_id IS NULL
-                  AND effective_from <= :dt AND (effective_to IS NULL OR effective_to >= :dt)
+                  AND effective_from <= :dt1 AND (effective_to IS NULL OR effective_to >= :dt2)
                 ORDER BY id DESC LIMIT 1
             ");
-            $stmt->execute([':cid' => $clientId, ':catid' => $categoryId, ':sid' => $siteId, ':dt' => $date]);
+            $stmt->execute([':cid' => $clientId, ':catid' => $categoryId, ':sid' => $siteId, ':dt1' => $date, ':dt2' => $date]);
             if ($row = $stmt->fetch()) {
                 return [
                     'client_rate' => (float)$row['client_billing_rate'],
@@ -218,10 +218,10 @@ class DeploymentService {
                 SELECT client_billing_rate 
                 FROM rate_cards 
                 WHERE client_id = :cid AND category_id = :catid AND site_id IS NULL AND shift_id IS NULL AND staff_id IS NULL
-                  AND effective_from <= :dt AND (effective_to IS NULL OR effective_to >= :dt)
+                  AND effective_from <= :dt1 AND (effective_to IS NULL OR effective_to >= :dt2)
                 ORDER BY id DESC LIMIT 1
             ");
-            $stmt->execute([':cid' => $clientId, ':catid' => $categoryId, ':dt' => $date]);
+            $stmt->execute([':cid' => $clientId, ':catid' => $categoryId, ':dt1' => $date, ':dt2' => $date]);
             if ($row = $stmt->fetch()) {
                 return [
                     'client_rate' => (float)$row['client_billing_rate'],
@@ -236,10 +236,10 @@ class DeploymentService {
             SELECT client_billing_rate 
             FROM rate_cards 
             WHERE client_id = :cid AND site_id = :sid AND shift_id = :shid AND staff_id IS NULL AND category_id IS NULL
-              AND effective_from <= :dt AND (effective_to IS NULL OR effective_to >= :dt)
+              AND effective_from <= :dt1 AND (effective_to IS NULL OR effective_to >= :dt2)
             ORDER BY id DESC LIMIT 1
         ");
-        $stmt->execute([':cid' => $clientId, ':sid' => $siteId, ':shid' => $shiftId, ':dt' => $date]);
+        $stmt->execute([':cid' => $clientId, ':sid' => $siteId, ':shid' => $shiftId, ':dt1' => $date, ':dt2' => $date]);
         if ($row = $stmt->fetch()) {
             return [
                 'client_rate' => (float)$row['client_billing_rate'],
@@ -253,10 +253,10 @@ class DeploymentService {
             SELECT client_billing_rate 
             FROM rate_cards 
             WHERE client_id = :cid AND site_id IS NULL AND shift_id = :shid AND staff_id IS NULL AND category_id IS NULL
-              AND effective_from <= :dt AND (effective_to IS NULL OR effective_to >= :dt)
+              AND effective_from <= :dt1 AND (effective_to IS NULL OR effective_to >= :dt2)
             ORDER BY id DESC LIMIT 1
         ");
-        $stmt->execute([':cid' => $clientId, ':shid' => $shiftId, ':dt' => $date]);
+        $stmt->execute([':cid' => $clientId, ':shid' => $shiftId, ':dt1' => $date, ':dt2' => $date]);
         if ($row = $stmt->fetch()) {
             return [
                 'client_rate' => (float)$row['client_billing_rate'],

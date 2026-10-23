@@ -6,7 +6,7 @@
 <?php if (empty($hideFooter)): ?>
     <footer class="py-3 px-4 bg-white border-top text-muted d-flex justify-content-between align-items-center flex-wrap" style="font-size: 0.8rem;">
         <div>
-            &copy; <?= date('Y') ?> <strong><?= APP_NAME ?></strong>. All rights reserved.
+            &copy; <?= date('Y') ?> <strong><?= htmlspecialchars(Helper::getCompanyName()) ?></strong>. All rights reserved.
         </div>
         <div class="d-flex gap-3">
             <span>Server Time (IST): <strong><?= date('H:i:s') ?></strong></span>

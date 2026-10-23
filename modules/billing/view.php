@@ -653,12 +653,12 @@ footer, .app-footer, footer.d-flex, footer.border-top {
                     <i class="bi bi-bank me-1 text-primary"></i> Bank Transfer & Payment Details:
                 </div>
                 <div><strong>Beneficiary Name:</strong> <?= htmlspecialchars(!empty($company['account_holder']) ? $company['account_holder'] : $companyName) ?></div>
-                <div><strong>Bank Name:</strong> <?= htmlspecialchars(!empty($company['bank_name']) ? $company['bank_name'] : ($bankAccount['bank_name'] ?? 'HDFC Bank')) ?></div>
-                <div><strong>Account No:</strong> <span class="font-monospace fw-bold"><?= htmlspecialchars(!empty($company['account_number']) ? $company['account_number'] : ($bankAccount['account_number'] ?? '50200012345678')) ?></span></div>
-                <div><strong>IFSC Code:</strong> <span class="font-monospace fw-bold"><?= htmlspecialchars(!empty($company['ifsc_code']) ? $company['ifsc_code'] : ($bankAccount['ifsc_code'] ?? 'HDFC0001234')) ?></span></div>
+                <div><strong>Bank Name:</strong> <?= htmlspecialchars(!empty($company['bank_name']) ? $company['bank_name'] : ($bankAccount['bank_name'] ?? '-')) ?></div>
+                <div><strong>Account No:</strong> <span class="font-monospace fw-bold"><?= htmlspecialchars(!empty($company['account_number']) ? $company['account_number'] : ($bankAccount['account_number'] ?? '-')) ?></span></div>
+                <div><strong>IFSC Code:</strong> <span class="font-monospace fw-bold"><?= htmlspecialchars(!empty($company['ifsc_code']) ? $company['ifsc_code'] : ($bankAccount['ifsc_code'] ?? '-')) ?></span></div>
                 <?php if (!empty($company['upi_id']) || !empty($upiAccount['account_number'])): ?>
                     <div class="mt-0.5 pt-0.5 border-top">
-                        <strong>Official UPI ID:</strong> <span class="text-success fw-bold font-monospace"><?= htmlspecialchars(!empty($company['upi_id']) ? $company['upi_id'] : ($upiAccount['account_number'] ?? 'kansanmanpower@hdfcbank')) ?></span>
+                        <strong>Official UPI ID:</strong> <span class="text-success fw-bold font-monospace"><?= htmlspecialchars(!empty($company['upi_id']) ? $company['upi_id'] : ($upiAccount['account_number'] ?? '')) ?></span>
                     </div>
                 <?php endif; ?>
             </div>

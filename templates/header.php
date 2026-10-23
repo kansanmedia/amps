@@ -10,8 +10,8 @@ $pageTitle = $pageTitle ?? 'Dashboard';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Kansan Manpower Management - Daily Staff Deployment, Attendance, Billing, and Accounting System">
-    <title><?= htmlspecialchars($pageTitle) ?> | <?= APP_NAME ?></title>
+    <meta name="description" content="<?= htmlspecialchars(Helper::getCompanyName()) ?> - Daily Staff Deployment, Attendance, Billing, and Accounting System">
+    <title><?= htmlspecialchars($pageTitle) ?> | <?= htmlspecialchars(Helper::getCompanyName()) ?></title>
 
     <!-- Bootstrap 5.3 CSS -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/bootstrap.min.css">

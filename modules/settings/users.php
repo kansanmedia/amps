@@ -187,7 +187,7 @@ require_once ROOT_PATH . '/templates/navbar.php';
 
                         <div class="col-md-6">
                             <label class="form-label small fw-semibold">Email Address *</label>
-                            <input type="email" name="email" id="modal_u_email" class="form-control" placeholder="john@kansan.com" required>
+                            <input type="email" name="email" id="modal_u_email" class="form-control" placeholder="user@example.com" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-semibold">Phone</label>

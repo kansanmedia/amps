@@ -56,7 +56,8 @@ require_once ROOT_PATH . '/templates/navbar.php';
                             <tr><td colspan="5" class="text-center py-4 text-muted">No scheduled deployments found.</td></tr>
                         <?php else: ?>
                             <?php foreach ($deployments as $d): 
-                                $msg = "Namaste {$d['staff_name']} ji! You are scheduled for work on " . date('d M Y', strtotime($d['deployment_date'])) . ". Venue: {$d['site_name']} ({$d['company_name']}). Shift: {$d['shift_name']} from " . date('h:i A', strtotime($d['start_time'])) . ". Address: {$d['location_address']}. Please report 15 mins early in proper uniform. - Kansan Manpower";
+                                $compSignature = Helper::getCompanyName();
+                                $msg = "Namaste {$d['staff_name']} ji! You are scheduled for work on " . date('d M Y', strtotime($d['deployment_date'])) . ". Venue: {$d['site_name']} ({$d['company_name']}). Shift: {$d['shift_name']} from " . date('h:i A', strtotime($d['start_time'])) . ". Address: {$d['location_address']}. Please report 15 mins early in proper uniform. - {$compSignature}";
                                 $waLink = "https://wa.me/91" . preg_replace('/[^0-9]/', '', $d['staff_phone']) . "?text=" . urlencode($msg);
                             ?>
                                 <tr>

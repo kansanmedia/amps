@@ -67,7 +67,6 @@ if (file_exists(ROOT_PATH . '/config.local.php')) {
 }
 
 // App Constants
-define('APP_NAME', 'Kansan Manpower Management');
 define('APP_VERSION', '1.0.0');
 
 // Base URL calculation
@@ -110,3 +109,9 @@ require_once ROOT_PATH . '/core/Helper.php';
 require_once ROOT_PATH . '/core/CSRF.php';
 require_once ROOT_PATH . '/core/Auth.php';
 require_once ROOT_PATH . '/core/Audit.php';
+
+// Dynamic App Name from Company Settings Database
+if (!defined('APP_NAME')) {
+    define('APP_NAME', Helper::getCompanyName());
+}
+

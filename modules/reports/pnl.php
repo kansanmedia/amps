@@ -387,7 +387,8 @@ require_once ROOT_PATH . '/templates/navbar.php';
 
 <script>
 function downloadPnLPDF() {
-    downloadElementAsPDF('pnl-report-container', 'Kansan_PNL_Statement_<?= $startDate ?>_to_<?= $endDate ?>', {
+    const compSlug = '<?= preg_replace('/[^a-zA-Z0-9_-]/', '_', Helper::getCompanyName()) ?>';
+    downloadElementAsPDF('pnl-report-container', compSlug + '_PNL_Statement_<?= $startDate ?>_to_<?= $endDate ?>', {
         margin: [8, 8, 8, 8],
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
     });

@@ -30,8 +30,8 @@ class DB {
             $options = [
                 PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                // Security Hardening: Enforce real native prepared statements (disable PDO emulation)
-                PDO::ATTR_EMULATE_PREPARES   => false,
+                // Support repeated named placeholders across queries and avoid SQLSTATE[HY093]
+                PDO::ATTR_EMULATE_PREPARES   => true,
             ];
             try {
                 self::$instance = new PDO($dsn, DB_USER, DB_PASS, $options);

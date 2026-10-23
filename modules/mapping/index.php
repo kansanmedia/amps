@@ -257,7 +257,7 @@ foreach ($allSites as $st) {
 }
 
 // 7. Prepare WhatsApp Roster Message Text
-$waMessage = "📋 *Kansan Manpower Deployment Roster*\n";
+$waMessage = "📋 *" . Helper::getCompanyName() . " Deployment Roster*\n";
 $waMessage .= "📅 *Date:* " . date('d M Y (l)', strtotime($selectedDate)) . "\n";
 if ($selectedShiftId > 0) {
     $activeShName = '';
@@ -286,7 +286,7 @@ if (!empty($deployments)) {
     $waMessage .= "\nNo staff scheduled yet for this date.";
 }
 
-$pageTitle = 'Daily Staff Mapping Roster | Kansan Manpower Management';
+$pageTitle = 'Daily Staff Mapping Roster | ' . Helper::getCompanyName();
 require_once ROOT_PATH . '/templates/header.php';
 require_once ROOT_PATH . '/templates/sidebar.php';
 require_once ROOT_PATH . '/templates/navbar.php';

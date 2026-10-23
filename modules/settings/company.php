@@ -393,8 +393,8 @@ require_once ROOT_PATH . '/templates/navbar.php';
                                 <div class="input-group">
                                     <span class="input-group-text bg-light"><i class="bi bi-person-badge"></i></span>
                                     <input type="text" name="account_holder" class="form-control" 
-                                           placeholder="e.g. Kansan Manpower Solutions" 
-                                           value="<?= htmlspecialchars($company['account_holder'] ?? ($company['company_name'] ?? 'Kansan Manpower Solutions')) ?>" required>
+                                           placeholder="e.g. Account Holder Name" 
+                                           value="<?= htmlspecialchars($company['account_holder'] ?? ($company['company_name'] ?? '')) ?>" required>
                                 </div>
                             </div>
 
@@ -404,7 +404,7 @@ require_once ROOT_PATH . '/templates/navbar.php';
                                     <span class="input-group-text bg-light"><i class="bi bi-credit-card-2-front"></i></span>
                                     <input type="text" name="account_number" class="form-control font-monospace fw-bold" 
                                            placeholder="e.g. 50200098765432" 
-                                           value="<?= htmlspecialchars($company['account_number'] ?? '50200098765432') ?>" required>
+                                           value="<?= htmlspecialchars($company['account_number'] ?? '') ?>" required>
                                 </div>
                             </div>
 
@@ -414,7 +414,7 @@ require_once ROOT_PATH . '/templates/navbar.php';
                                     <span class="input-group-text bg-light"><i class="bi bi-upc-scan"></i></span>
                                     <input type="text" name="ifsc_code" class="form-control font-monospace text-uppercase" 
                                            placeholder="e.g. HDFC0001234" 
-                                           value="<?= htmlspecialchars($company['ifsc_code'] ?? 'HDFC0001234') ?>" required>
+                                           value="<?= htmlspecialchars($company['ifsc_code'] ?? '') ?>" required>
                                 </div>
                             </div>
 
@@ -423,8 +423,8 @@ require_once ROOT_PATH . '/templates/navbar.php';
                                 <div class="input-group">
                                     <span class="input-group-text bg-light"><i class="bi bi-geo-alt"></i></span>
                                     <input type="text" name="branch_name" class="form-control" 
-                                           placeholder="e.g. Connaught Place Branch, New Delhi" 
-                                           value="<?= htmlspecialchars($company['branch_name'] ?? 'Main Branch') ?>">
+                                           placeholder="e.g. Main Branch" 
+                                           value="<?= htmlspecialchars($company['branch_name'] ?? '') ?>">
                                 </div>
                             </div>
 
@@ -433,8 +433,8 @@ require_once ROOT_PATH . '/templates/navbar.php';
                                 <div class="input-group">
                                     <span class="input-group-text bg-light text-success"><i class="bi bi-phone"></i></span>
                                     <input type="text" name="upi_id" class="form-control text-success fw-bold" 
-                                           placeholder="e.g. kansanmanpower@hdfcbank" 
-                                           value="<?= htmlspecialchars($company['upi_id'] ?? 'kansanmanpower@hdfcbank') ?>">
+                                           placeholder="e.g. company@upi" 
+                                           value="<?= htmlspecialchars($company['upi_id'] ?? '') ?>">
                                 </div>
                             </div>
                         </div>
@@ -445,9 +445,9 @@ require_once ROOT_PATH . '/templates/navbar.php';
                                 <i class="bi bi-eye me-1"></i> Live Invoice Preview (Client Display):
                             </div>
                             <div class="bg-white p-2.5 rounded border small font-monospace">
-                                <div><strong>Beneficiary:</strong> <?= htmlspecialchars($company['account_holder'] ?? 'Kansan Manpower Solutions') ?></div>
-                                <div><strong>Bank:</strong> <?= htmlspecialchars($company['bank_name'] ?? 'HDFC Bank Ltd') ?> | <strong>A/C:</strong> <?= htmlspecialchars($company['account_number'] ?? '50200098765432') ?></div>
-                                <div><strong>IFSC:</strong> <?= htmlspecialchars($company['ifsc_code'] ?? 'HDFC0001234') ?> | <strong>UPI:</strong> <?= htmlspecialchars($company['upi_id'] ?? 'kansanmanpower@hdfcbank') ?></div>
+                                <div><strong>Beneficiary:</strong> <?= htmlspecialchars($company['account_holder'] ?? ($company['company_name'] ?? '')) ?></div>
+                                <div><strong>Bank:</strong> <?= htmlspecialchars($company['bank_name'] ?? '-') ?> | <strong>A/C:</strong> <?= htmlspecialchars($company['account_number'] ?? '-') ?></div>
+                                <div><strong>IFSC:</strong> <?= htmlspecialchars($company['ifsc_code'] ?? '-') ?> | <strong>UPI:</strong> <?= htmlspecialchars($company['upi_id'] ?? '-') ?></div>
                             </div>
                         </div>
 

@@ -4,6 +4,98 @@
 declare(strict_types=1);
 
 class Helper {
+    private static ?array $companySettings = null;
+
+    /**
+     * Get cached company settings from company_settings table with graceful fallback
+     */
+    public static function getCompanySettings(): array {
+        if (self::$companySettings !== null) {
+            return self::$companySettings;
+        }
+
+        try {
+            $db = DB::getConnection();
+            $stmt = $db->query("SELECT * FROM company_settings WHERE id = 1 LIMIT 1");
+            $data = $stmt->fetch();
+            if ($data && is_array($data) && !empty($data['company_name'])) {
+                self::$companySettings = $data;
+                return self::$companySettings;
+            }
+        } catch (\Throwable $e) {
+            // Database not yet connected or table empty
+        }
+
+        self::$companySettings = [
+            'company_name' => 'ADITYA MANPOWER SUPPLIER',
+            'tagline'      => 'All types of Manpower suppliers for Hotel/ Banquet Hall/O.D.C. & Other purpose',
+            'email'        => 'contact@kansanmanpower.com',
+            'phone'        => '8051296873',
+            'address'      => '',
+            'logo_url'     => '',
+            'currency_symbol' => '₹',
+            'invoice_prefix'  => 'INV-',
+        ];
+        return self::$companySettings;
+    }
+
+    /**
+     * Force refresh cached company settings (e.g. after updating settings in admin panel)
+     */
+    public static function refreshCompanySettings(): array {
+        self::$companySettings = null;
+        return self::getCompanySettings();
+    }
+
+    /**
+     * Get dynamic company name
+     */
+    public static function getCompanyName(): string {
+        $settings = self::getCompanySettings();
+        return !empty($settings['company_name']) ? (string)$settings['company_name'] : 'ADITYA MANPOWER SUPPLIER';
+    }
+
+    /**
+     * Get dynamic company tagline
+     */
+    public static function getCompanyTagline(): string {
+        $settings = self::getCompanySettings();
+        return !empty($settings['tagline']) ? (string)$settings['tagline'] : 'Workforce Deployment & Enterprise Operations';
+    }
+
+    /**
+     * Generate dynamic initials from company name (e.g. "ADITYA MANPOWER SUPPLIER" -> "AMS")
+     */
+    public static function getCompanyInitials(): string {
+        $name = trim(self::getCompanyName());
+        if (empty($name)) return 'AMS';
+        $words = preg_split('/\s+/', $name);
+        $initials = '';
+        foreach ($words as $w) {
+            $w = trim($w);
+            if ($w !== '') {
+                $initials .= mb_strtoupper(mb_substr($w, 0, 1));
+            }
+            if (mb_strlen($initials) >= 3) break;
+        }
+        return $initials ?: 'AMS';
+    }
+
+    /**
+     * Get company logo web URL if exists on disk
+     */
+    public static function getCompanyLogo(): ?string {
+        $settings = self::getCompanySettings();
+        $logo = $settings['logo_url'] ?? '';
+        if (!empty($logo) && defined('ROOT_PATH')) {
+            $cleanLogo = ltrim(str_replace('\\', '/', $logo), '/');
+            if (file_exists(ROOT_PATH . '/' . $cleanLogo)) {
+                return (defined('BASE_URL') ? BASE_URL : '') . '/' . $cleanLogo;
+            }
+        }
+        return null;
+    }
+
     /**
      * Format currency with Rupee symbol and Indian numbering
      */

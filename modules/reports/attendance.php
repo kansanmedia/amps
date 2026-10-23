@@ -165,7 +165,8 @@ require_once ROOT_PATH . '/templates/navbar.php';
 
 <script>
 function downloadAttendancePDF() {
-    downloadElementAsPDF('attendance-report-container', 'Kansan_Attendance_Report_<?= $startDate ?>_to_<?= $endDate ?>', {
+    const compSlug = '<?= preg_replace('/[^a-zA-Z0-9_-]/', '_', Helper::getCompanyName()) ?>';
+    downloadElementAsPDF('attendance-report-container', compSlug + '_Attendance_Report_<?= $startDate ?>_to_<?= $endDate ?>', {
         margin: [8, 8, 8, 8],
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
     });

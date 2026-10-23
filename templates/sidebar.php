@@ -7,13 +7,25 @@ $role = $user['role'] ?? 'staff';
 function navActive(string $path, string $currentUri): string {
     return (str_contains($currentUri, $path)) ? 'active' : '';
 }
+$sidebarCompanyName = Helper::getCompanyName();
+$sidebarCompanyTagline = Helper::getCompanyTagline();
+$sidebarCompanyInitials = Helper::getCompanyInitials();
+$sidebarCompanyLogo = Helper::getCompanyLogo();
 ?>
 <aside class="app-sidebar">
     <a href="<?= BASE_URL ?>/modules/dashboard/index.php" class="sidebar-brand">
-        <div class="brand-badge">KM</div>
-        <div>
-            <div style="line-height:1.2; font-size:1.05rem;">Kansan</div>
-            <div style="font-size:0.7rem; color:#94a3b8; font-weight:400;">Manpower Suite</div>
+        <?php if ($sidebarCompanyLogo): ?>
+            <img src="<?= $sidebarCompanyLogo ?>" alt="<?= htmlspecialchars($sidebarCompanyName) ?>" style="width: 36px; height: 36px; min-width: 36px; object-fit: contain; border-radius: 10px; background: #fff; padding: 2px;">
+        <?php else: ?>
+            <div class="brand-badge"><?= htmlspecialchars($sidebarCompanyInitials) ?></div>
+        <?php endif; ?>
+        <div style="overflow: hidden; min-width: 0;">
+            <div style="line-height:1.2; font-size:0.96rem; font-weight:700; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;" title="<?= htmlspecialchars($sidebarCompanyName) ?>">
+                <?= htmlspecialchars($sidebarCompanyName) ?>
+            </div>
+            <div style="font-size:0.68rem; color:#94a3b8; font-weight:400; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;" title="<?= htmlspecialchars($sidebarCompanyTagline) ?>">
+                <?= htmlspecialchars($sidebarCompanyTagline) ?>
+            </div>
         </div>
     </a>
 

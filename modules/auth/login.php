@@ -86,11 +86,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <div class="login-card">
     <div class="login-header">
-        <div class="d-inline-flex align-items-center justify-content-center bg-white text-primary rounded-3 mb-2" style="width: 48px; height: 48px; font-size: 1.5rem; font-weight: 800;">
-            KM
-        </div>
-        <h4 class="fw-bold mb-1">Kansan Manpower</h4>
-        <p class="text-white-50 small mb-0">Workforce Deployment & Enterprise Operations</p>
+        <?php
+        $loginCompName = Helper::getCompanyName();
+        $loginCompTagline = Helper::getCompanyTagline();
+        $loginCompInitials = Helper::getCompanyInitials();
+        $loginCompLogo = Helper::getCompanyLogo();
+        ?>
+        <?php if ($loginCompLogo): ?>
+            <img src="<?= $loginCompLogo ?>" alt="<?= htmlspecialchars($loginCompName) ?>" class="mb-2" style="max-height: 52px; max-width: 140px; object-fit: contain; background: #fff; padding: 4px; border-radius: 8px;">
+        <?php else: ?>
+            <div class="d-inline-flex align-items-center justify-content-center bg-white text-primary rounded-3 mb-2" style="width: 52px; height: 52px; font-size: 1.35rem; font-weight: 800; letter-spacing: -0.5px;">
+                <?= htmlspecialchars($loginCompInitials) ?>
+            </div>
+        <?php endif; ?>
+        <h4 class="fw-bold mb-1"><?= htmlspecialchars($loginCompName) ?></h4>
+        <p class="text-white-50 small mb-0"><?= htmlspecialchars($loginCompTagline) ?></p>
     </div>
 
     <div class="p-4">
