@@ -106,6 +106,97 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             Helper::setFlash('success', "Account '{$accName}' created successfully.");
             Helper::redirect('modules/accounting/accounts.php');
         }
+    } elseif ($action === 'set_opening_balance') {
+        $accId = (int)($_POST['account_id'] ?? 0);
+        $amount = (float)($_POST['amount'] ?? 0);
+        $entryDate = !empty($_POST['entry_date']) ? $_POST['entry_date'] : date('Y-m-d');
+        $adjustmentType = $_POST['adjustment_type'] ?? 'opening_balance';
+        $narration = trim($_POST['narration'] ?? '');
+
+        if ($accId <= 0 || $amount < 0) {
+            $error = 'Please select a valid account and enter a non-negative amount.';
+        } else {
+            $accStmt = $db->prepare("SELECT * FROM financial_accounts WHERE id = :id");
+            $accStmt->execute([':id' => $accId]);
+            $acc = $accStmt->fetch();
+
+            if (!$acc) {
+                $error = 'Account not found.';
+            } else {
+                $db->beginTransaction();
+                try {
+                    if ($adjustmentType === 'opening_balance') {
+                        $oldOpenBal = (float)$acc['opening_balance'];
+                        $diff = $amount - $oldOpenBal;
+                        $defaultNarr = "Opening Balance - {$acc['account_name']}";
+                        $finalNarr = !empty($narration) ? $narration : $defaultNarr;
+
+                        $chkLedger = $db->prepare("SELECT id FROM ledger_entries WHERE account_id = :accId AND source_type = 'opening_balance' ORDER BY id ASC LIMIT 1");
+                        $chkLedger->execute([':accId' => $accId]);
+                        $existingEntryId = $chkLedger->fetchColumn();
+
+                        if ($existingEntryId) {
+                            $db->prepare("UPDATE ledger_entries SET amount = :amt, running_balance = :amt, entry_date = :dt, narration = :narr WHERE id = :id")
+                               ->execute([
+                                   ':amt' => $amount,
+                                   ':dt' => $entryDate,
+                                   ':narr' => $finalNarr,
+                                   ':id' => $existingEntryId
+                               ]);
+                        } else {
+                            $db->prepare("
+                                INSERT INTO ledger_entries (transaction_id, entry_date, account_id, entity_type, entity_id, entry_type, amount, running_balance, source_type, source_id, narration, created_by)
+                                VALUES (:txnid, :dt, :acc, 'financial_account', :acc, 'debit', :amt, :amt, 'opening_balance', :acc, :narr, :uid)
+                            ")->execute([
+                                ':txnid' => 'TXN-INIT-' . ($acc['account_code'] ?: $accId) . '-' . date('Ymd'),
+                                ':dt' => $entryDate,
+                                ':acc' => $accId,
+                                ':amt' => $amount,
+                                ':narr' => $finalNarr,
+                                ':uid' => Auth::id()
+                            ]);
+                        }
+
+                        $db->prepare("UPDATE financial_accounts SET opening_balance = :ob, current_balance = current_balance + :diff WHERE id = :id")
+                           ->execute([':ob' => $amount, ':diff' => $diff, ':id' => $accId]);
+
+                        $flashMsg = "Opening balance for '{$acc['account_name']}' set to " . Helper::formatCurrency($amount) . " successfully.";
+                    } else {
+                        // Direct Capital Deposit
+                        $defaultNarr = "Capital Inflow / Owner Equity - {$acc['account_name']}";
+                        $finalNarr = !empty($narration) ? $narration : $defaultNarr;
+                        $newBal = (float)$acc['current_balance'] + $amount;
+
+                        $txnId = 'TXN-CAP-' . date('YmdHis') . '-' . rand(100, 999);
+                        $db->prepare("
+                            INSERT INTO ledger_entries (transaction_id, entry_date, account_id, entity_type, entity_id, entry_type, amount, running_balance, source_type, source_id, narration, created_by)
+                            VALUES (:txnid, :dt, :acc, 'financial_account', :acc, 'debit', :amt, :rbal, 'opening_balance', :acc, :narr, :uid)
+                        ")->execute([
+                            ':txnid' => $txnId,
+                            ':dt' => $entryDate,
+                            ':acc' => $accId,
+                            ':amt' => $amount,
+                            ':rbal' => $newBal,
+                            ':narr' => $finalNarr,
+                            ':uid' => Auth::id()
+                        ]);
+
+                        $db->prepare("UPDATE financial_accounts SET current_balance = current_balance + :amt WHERE id = :id")
+                           ->execute([':amt' => $amount, ':id' => $accId]);
+
+                        $flashMsg = "Capital deposit of " . Helper::formatCurrency($amount) . " added to '{$acc['account_name']}' successfully.";
+                    }
+
+                    $db->commit();
+                    Audit::log('SET_BALANCE', 'FINANCIAL_ACCOUNTS', $accId, null, $_POST);
+                    Helper::setFlash('success', $flashMsg);
+                    Helper::redirect('modules/accounting/accounts.php');
+                } catch (Exception $e) {
+                    $db->rollBack();
+                    $error = 'Failed to update balance: ' . $e->getMessage();
+                }
+            }
+        }
     } elseif ($action === 'edit_account') {
         $accId = (int)($_POST['account_id'] ?? 0);
         $accName = trim($_POST['account_name'] ?? '');
@@ -113,21 +204,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $accNo = trim($_POST['account_number'] ?? '');
         $ifsc = strtoupper(trim($_POST['ifsc_code'] ?? ''));
         $status = in_array($_POST['status'] ?? '', ['active', 'inactive']) ? $_POST['status'] : 'active';
+        $hasOpenBal = isset($_POST['opening_balance']);
+        $newOpenBal = $hasOpenBal ? max(0, (float)$_POST['opening_balance']) : null;
 
         if ($accId <= 0 || empty($accName)) {
             $error = 'Valid account ID and Account Name are required.';
         } else {
-            $upd = $db->prepare("
-                UPDATE financial_accounts 
-                SET account_name = :name, bank_name = :bname, account_number = :ano, ifsc_code = :ifsc, status = :status
-                WHERE id = :id
-            ");
-            $upd->execute([
-                ':name' => $accName, ':bname' => $bankName, ':ano' => $accNo, ':ifsc' => $ifsc, ':status' => $status, ':id' => $accId
-            ]);
-            Audit::log('UPDATE', 'FINANCIAL_ACCOUNTS', $accId, null, $_POST);
-            Helper::setFlash('success', "Account '{$accName}' details updated successfully.");
-            Helper::redirect('modules/accounting/accounts.php');
+            $accStmt = $db->prepare("SELECT * FROM financial_accounts WHERE id = :id");
+            $accStmt->execute([':id' => $accId]);
+            $currentAcc = $accStmt->fetch();
+
+            if (!$currentAcc) {
+                $error = 'Account not found.';
+            } else {
+                $db->beginTransaction();
+                try {
+                    $upd = $db->prepare("
+                        UPDATE financial_accounts 
+                        SET account_name = :name, bank_name = :bname, account_number = :ano, ifsc_code = :ifsc, status = :status
+                        WHERE id = :id
+                    ");
+                    $upd->execute([
+                        ':name' => $accName, ':bname' => $bankName, ':ano' => $accNo, ':ifsc' => $ifsc, ':status' => $status, ':id' => $accId
+                    ]);
+
+                    if ($hasOpenBal && $newOpenBal !== null) {
+                        $oldOpenBal = (float)$currentAcc['opening_balance'];
+                        $diff = $newOpenBal - $oldOpenBal;
+
+                        $chkLedger = $db->prepare("SELECT id FROM ledger_entries WHERE account_id = :accId AND source_type = 'opening_balance' ORDER BY id ASC LIMIT 1");
+                        $chkLedger->execute([':accId' => $accId]);
+                        $existingEntryId = $chkLedger->fetchColumn();
+
+                        if ($existingEntryId) {
+                            $db->prepare("UPDATE ledger_entries SET amount = :amt, running_balance = :amt, narration = :narr WHERE id = :id")
+                               ->execute([
+                                   ':amt' => $newOpenBal,
+                                   ':narr' => "Opening Balance - {$accName}",
+                                   ':id' => $existingEntryId
+                               ]);
+                        } elseif ($newOpenBal > 0) {
+                            $db->prepare("
+                                INSERT INTO ledger_entries (transaction_id, entry_date, account_id, entity_type, entity_id, entry_type, amount, running_balance, source_type, source_id, narration, created_by)
+                                VALUES (:txnid, CURDATE(), :acc, 'financial_account', :acc, 'debit', :amt, :amt, 'opening_balance', :acc, :narr, :uid)
+                            ")->execute([
+                                ':txnid' => 'TXN-INIT-' . ($currentAcc['account_code'] ?: $accId),
+                                ':acc' => $accId,
+                                ':amt' => $newOpenBal,
+                                ':narr' => "Opening Balance - {$accName}",
+                                ':uid' => Auth::id()
+                            ]);
+                        }
+
+                        $db->prepare("UPDATE financial_accounts SET opening_balance = :ob, current_balance = current_balance + :diff WHERE id = :id")
+                           ->execute([':ob' => $newOpenBal, ':diff' => $diff, ':id' => $accId]);
+                    }
+
+                    $db->commit();
+                    Audit::log('UPDATE', 'FINANCIAL_ACCOUNTS', $accId, $currentAcc, $_POST);
+                    Helper::setFlash('success', "Account '{$accName}' updated successfully.");
+                    Helper::redirect('modules/accounting/accounts.php');
+                } catch (Exception $e) {
+                    $db->rollBack();
+                    $error = 'Failed to update account: ' . $e->getMessage();
+                }
+            }
         }
     } elseif ($action === 'toggle_status') {
         $accId = (int)($_POST['account_id'] ?? 0);
@@ -252,11 +393,14 @@ require_once ROOT_PATH . '/templates/navbar.php';
         <h4 class="fw-bold mb-1"><i class="bi bi-journal-bookmark-fill text-primary me-2"></i>Accounts & Financial Ledgers</h4>
         <p class="text-muted small mb-0">Maintain cash in hand, bank accounts, and UPI balances with synchronized double-entry postings.</p>
     </div>
-    <div class="d-flex gap-2">
-        <button type="button" class="btn btn-outline-primary btn-sm" onclick="openTransferModal()">
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+        <button type="button" class="btn btn-success btn-sm fw-semibold" onclick="openOpeningBalanceModal()">
+            <i class="bi bi-cash-stack me-1"></i> Add / Set Opening Balance
+        </button>
+        <button type="button" class="btn btn-outline-primary btn-sm fw-semibold" onclick="openTransferModal()">
             <i class="bi bi-arrow-left-right me-1"></i> Inter-Account Transfer
         </button>
-        <button type="button" class="btn btn-primary btn-sm" onclick="openNewAccountModal()">
+        <button type="button" class="btn btn-primary btn-sm fw-semibold" onclick="openNewAccountModal()">
             <i class="bi bi-plus-lg me-1"></i> Add Account
         </button>
     </div>
@@ -307,7 +451,12 @@ require_once ROOT_PATH . '/templates/navbar.php';
                 </div>
 
                 <div class="my-2">
-                    <div class="text-muted small" style="font-size:0.75rem;">CURRENT BALANCE</div>
+                    <div class="d-flex justify-content-between align-items-center mb-0.5">
+                        <div class="text-muted small fw-semibold" style="font-size:0.72rem; letter-spacing: 0.3px;">CURRENT BALANCE</div>
+                        <span class="badge bg-light text-secondary border fw-medium" style="font-size:0.68rem;" title="Starting Opening Balance">
+                            Opening: <?= Helper::formatCurrency($acc['opening_balance']) ?>
+                        </span>
+                    </div>
                     <div class="fs-4 fw-bold text-dark"><?= Helper::formatCurrency($acc['current_balance']) ?></div>
                 </div>
 
@@ -327,6 +476,11 @@ require_once ROOT_PATH . '/templates/navbar.php';
                             style="font-size:0.78rem;" 
                             onclick='openEditAccountModal(<?= json_encode($acc, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>)'>
                         <i class="bi bi-pencil-square me-1"></i> Edit
+                    </button>
+
+                    <button type="button" class="btn btn-sm btn-outline-success py-1 px-2" style="font-size:0.78rem;" title="Set / Add Opening Balance"
+                            onclick='openOpeningBalanceModal(<?= $acc['id'] ?>)'>
+                        <i class="bi bi-cash-stack"></i>
                     </button>
 
                     <form method="POST" action="" class="d-inline">
@@ -587,9 +741,17 @@ require_once ROOT_PATH . '/templates/navbar.php';
                             </select>
                         </div>
 
-                        <div class="col-12">
+                        <div class="col-md-7">
                             <label class="form-label small fw-semibold">Account Name *</label>
                             <input type="text" name="account_name" id="edit_account_name" class="form-control" placeholder="e.g. Cash / Axis Current A/C" required>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label small fw-semibold">Opening Balance (₹)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">₹</span>
+                                <input type="number" step="0.5" min="0" name="opening_balance" id="edit_opening_balance" class="form-control fw-semibold" placeholder="0.00">
+                            </div>
+                            <small class="text-muted" style="font-size:0.7rem;">Starting capital / initial ledger balance</small>
                         </div>
 
                         <div class="col-md-6" id="edit_bank_name_group">
@@ -669,21 +831,111 @@ require_once ROOT_PATH . '/templates/navbar.php';
     </div>
 </div>
 
+<!-- Set Opening Balance / Capital Inflow Modal -->
+<div class="modal fade" id="openingBalanceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <form method="POST" action="">
+                <?= CSRF::tokenField() ?>
+                <input type="hidden" name="action" value="set_opening_balance">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-cash-stack me-2"></i>Add / Set Opening Balance & Capital</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label small fw-semibold">Select Financial Account *</label>
+                            <select name="account_id" id="ob_account_id" class="form-select" required onchange="onObAccountChange()">
+                                <option value="">-- Choose Account --</option>
+                                <?php foreach ($accounts as $a): ?>
+                                    <option value="<?= $a['id'] ?>" data-type="<?= $a['account_type'] ?>" data-curr="<?= $a['current_balance'] ?>" data-open="<?= $a['opening_balance'] ?>">
+                                        <?= htmlspecialchars($a['account_name']) ?> (<?= strtoupper($a['account_type']) ?> &bull; Current: <?= Helper::formatCurrency($a['current_balance']) ?>)
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">As-On / Entry Date *</label>
+                            <input type="date" name="entry_date" class="form-control" value="<?= date('Y-m-d') ?>" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Amount (₹) *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light fw-bold">₹</span>
+                                <input type="number" step="0.5" min="0" name="amount" id="ob_amount" class="form-control fw-bold text-success fs-6" placeholder="0.00" required>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label small fw-semibold">Adjustment Type</label>
+                            <select name="adjustment_type" id="ob_adjustment_type" class="form-select">
+                                <option value="opening_balance">Set Initial Opening Balance (Starting Ledger Capital)</option>
+                                <option value="capital_deposit">Add Direct Capital Inflow / Owner Investment (Credits Balance)</option>
+                            </select>
+                            <small class="text-muted" style="font-size:0.72rem;">Agar aap pehli baar balance daal rahe hain to "Set Initial Opening Balance" chunein.</small>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label small fw-semibold">Narration / Remarks</label>
+                            <input type="text" name="narration" id="ob_narration" class="form-control" placeholder="e.g. Initial Cash in Hand / Starting Bank Balance">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success btn-sm px-3 fw-bold">
+                        <i class="bi bi-check2-circle me-1"></i> Save & Post Balance
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
 const allAccountsData = <?= json_encode($accounts, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
 const transferModal = new bootstrap.Modal(document.getElementById('transferModal'));
 const newAccountModal = new bootstrap.Modal(document.getElementById('newAccountModal'));
 const editAccountModal = new bootstrap.Modal(document.getElementById('editAccountModal'));
 const deleteAccountModal = new bootstrap.Modal(document.getElementById('deleteAccountModal'));
+const openingBalanceModal = new bootstrap.Modal(document.getElementById('openingBalanceModal'));
 
 function openTransferModal() { transferModal.show(); }
 function openNewAccountModal() { newAccountModal.show(); }
+
+function openOpeningBalanceModal(accId = null) {
+    const sel = document.getElementById('ob_account_id');
+    if (accId) {
+        sel.value = accId;
+        onObAccountChange();
+    } else {
+        sel.value = '';
+        document.getElementById('ob_amount').value = '';
+        document.getElementById('ob_narration').value = '';
+    }
+    openingBalanceModal.show();
+}
+
+function onObAccountChange() {
+    const sel = document.getElementById('ob_account_id');
+    const accId = sel.value;
+    const acc = allAccountsData.find(a => a.id == accId);
+    if (acc) {
+        const openBal = parseFloat(acc.opening_balance || 0);
+        document.getElementById('ob_amount').value = openBal > 0 ? openBal.toFixed(2) : (parseFloat(acc.current_balance || 0) > 0 ? parseFloat(acc.current_balance).toFixed(2) : '');
+        document.getElementById('ob_narration').value = `Opening balance for ${acc.account_name}`;
+    }
+}
 
 function openEditAccountModal(acc) {
     document.getElementById('edit_account_id').value = acc.id;
     document.getElementById('edit_account_code').value = acc.account_code || '';
     document.getElementById('edit_account_name').value = acc.account_name || '';
     document.getElementById('edit_status').value = acc.status || 'active';
+    document.getElementById('edit_opening_balance').value = parseFloat(acc.opening_balance || 0).toFixed(2);
     document.getElementById('edit_bank_name').value = acc.bank_name || '';
     document.getElementById('edit_account_number').value = acc.account_number || '';
     document.getElementById('edit_ifsc_code').value = acc.ifsc_code || '';
