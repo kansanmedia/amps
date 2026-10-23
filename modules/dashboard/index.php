@@ -378,25 +378,25 @@ require_once ROOT_PATH . '/templates/navbar.php';
 
                 <!-- Desktop Date Navigator Bar -->
                 <div class="site-ops-desktop-controls align-items-center gap-2">
-                    <div class="d-flex align-items-center gap-1 border rounded p-1 bg-light date-pill-nav">
-                        <a href="?date=<?= $prevDate ?>" class="btn btn-xs btn-outline-secondary px-1.5 py-0.5" title="Previous Day">
+                    <div class="d-flex align-items-center gap-1.5 border rounded-2 p-1 bg-light date-pill-nav shadow-2xs">
+                        <a href="?date=<?= $prevDate ?>" class="btn btn-xs btn-outline-secondary px-2 py-1 bg-white text-dark shadow-2xs" title="Previous Day" style="font-size: 0.74rem; height: 28px; display: inline-flex; align-items: center;">
                             <i class="bi bi-chevron-left"></i>
                         </a>
-                        <a href="?date=<?= $today ?>" class="btn btn-xs <?= $isToday ? 'btn-primary text-white fw-bold' : 'btn-outline-primary' ?> px-2 py-0.5" style="font-size: 0.72rem;">
-                            <i class="bi bi-calendar-check me-0.5"></i> Today
+                        <a href="?date=<?= $today ?>" class="btn btn-xs <?= $isToday ? 'btn-primary text-white fw-bold' : 'btn-outline-primary bg-white' ?> px-2.5 py-1 shadow-2xs" style="font-size: 0.74rem; height: 28px; display: inline-flex; align-items: center;">
+                            <i class="bi bi-calendar-check me-1"></i> Today
                         </a>
-                        <a href="?date=<?= $nextDate ?>" class="btn btn-xs btn-outline-secondary px-1.5 py-0.5" title="Next Day">
+                        <a href="?date=<?= $nextDate ?>" class="btn btn-xs btn-outline-secondary px-2 py-1 bg-white text-dark shadow-2xs" title="Next Day" style="font-size: 0.74rem; height: 28px; display: inline-flex; align-items: center;">
                             <i class="bi bi-chevron-right"></i>
                         </a>
-                        <input type="date" class="form-control form-control-sm py-0 px-1 bg-white border-0" value="<?= $selectedDate ?>" onchange="location.href='?date=' + this.value" style="width: 110px; font-size: 0.72rem;">
+                        <input type="date" class="form-control form-control-sm py-0 px-2 bg-white border fw-semibold text-dark shadow-2xs" value="<?= $selectedDate ?>" onchange="location.href='?date=' + this.value" style="width: 140px; min-width: 140px; font-size: 0.78rem; height: 28px; border-radius: 6px; cursor: pointer;">
                     </div>
 
                     <!-- Desktop View Switcher -->
-                    <div class="btn-group btn-group-sm" role="group">
-                        <button type="button" class="btn btn-xs btn-primary active btn-view-sites fw-semibold py-1 px-2" id="btnViewSites" onclick="switchOpView('sites')" style="font-size: 0.75rem;">
+                    <div class="btn-group btn-group-sm shadow-2xs" role="group">
+                        <button type="button" class="btn btn-xs btn-primary active btn-view-sites fw-semibold py-1 px-2.5" id="btnViewSites" onclick="switchOpView('sites')" style="font-size: 0.75rem; height: 28px;">
                             <i class="bi bi-buildings me-1"></i> Sites (<?= $runningSitesCount ?>)
                         </button>
-                        <button type="button" class="btn btn-xs btn-outline-secondary btn-view-roster fw-semibold py-1 px-2" id="btnViewRoster" onclick="switchOpView('roster')" style="font-size: 0.75rem;">
+                        <button type="button" class="btn btn-xs btn-outline-secondary bg-white fw-semibold py-1 px-2.5" id="btnViewRoster" onclick="switchOpView('roster')" style="font-size: 0.75rem; height: 28px;">
                             <i class="bi bi-table me-1"></i> Table
                         </button>
                     </div>
@@ -414,9 +414,9 @@ require_once ROOT_PATH . '/templates/navbar.php';
                 </div>
                 <h6 class="fw-bold text-dark mb-1" style="font-size: 0.88rem;">No Active Running Sites for <?= Helper::formatDate($selectedDate) ?></h6>
                 <p class="text-muted small mb-2.5" style="font-size: 0.76rem;">No staff members have been scheduled for duty on this date yet.</p>
-                <button type="button" class="btn btn-primary btn-sm px-3" data-bs-toggle="modal" data-bs-target="#quickDeployModal" style="font-size: 0.76rem;">
-                    <i class="bi bi-person-plus-fill me-1"></i> Schedule Staff to Venue Now
-                </button>
+                <a href="<?= BASE_URL ?>/modules/mapping/deploy.php?date=<?= $selectedDate ?>" class="btn btn-primary btn-sm px-3.5 py-1.5 shadow-2xs fw-semibold" style="font-size: 0.78rem;">
+                    <i class="bi bi-file-earmark-spreadsheet-fill me-1"></i> Deploy Staff on Excel Sheet
+                </a>
             </div>
         <?php else: ?>
             <div class="site-command-grid-6">

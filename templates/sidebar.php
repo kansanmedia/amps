@@ -98,7 +98,12 @@ $sidebarCompanyLogo = Helper::getCompanyLogo();
         <!-- 5. System Administration -->
         <?php if (Auth::isOwnerAdmin()): ?>
         <div class="sidebar-heading mt-3">System Control</div>
-        <a href="<?= BASE_URL ?>/modules/settings/company.php" class="nav-link-custom <?= (navActive('/settings/', $currentUri) || navActive('/audit/', $currentUri) || navActive('/notifications/', $currentUri)) ? 'active' : '' ?>">
+        <a href="<?= BASE_URL ?>/modules/settings/users.php" class="nav-link-custom <?= navActive('/settings/users.php', $currentUri) ?>">
+            <i class="bi bi-people-gear"></i>
+            <span>Users & Roles</span>
+            <span class="badge bg-danger-subtle text-danger ms-auto" style="font-size:0.65rem;">Admin</span>
+        </a>
+        <a href="<?= BASE_URL ?>/modules/settings/company.php" class="nav-link-custom <?= (navActive('/settings/company.php', $currentUri) || navActive('/audit/', $currentUri) || navActive('/notifications/', $currentUri)) ? 'active' : '' ?>">
             <i class="bi bi-gear-fill"></i>
             <span>Company Settings</span>
         </a>

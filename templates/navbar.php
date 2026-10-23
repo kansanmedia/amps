@@ -74,8 +74,9 @@ foreach ($allShifts as $sh) {
                         <small class="text-muted"><?= htmlspecialchars($user['email'] ?? '') ?></small>
                     </li>
                     <?php if (Auth::isOwnerAdmin()): ?>
-                    <li><a class="dropdown-item py-2" href="<?= BASE_URL ?>/modules/settings/company.php"><i class="bi bi-gear me-2"></i> Company Settings</a></li>
-                    <li><a class="dropdown-item py-2" href="<?= BASE_URL ?>/modules/audit/index.php"><i class="bi bi-shield-check me-2"></i> Audit Trail</a></li>
+                    <li><a class="dropdown-item py-2" href="<?= BASE_URL ?>/modules/settings/users.php"><i class="bi bi-people-gear me-2 text-primary"></i> Users & Role Permissions</a></li>
+                    <li><a class="dropdown-item py-2" href="<?= BASE_URL ?>/modules/settings/company.php"><i class="bi bi-gear me-2 text-secondary"></i> Company Settings</a></li>
+                    <li><a class="dropdown-item py-2" href="<?= BASE_URL ?>/modules/audit/index.php"><i class="bi bi-shield-check me-2 text-info"></i> Audit Trail</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <?php endif; ?>
                     <li><a class="dropdown-item py-2 text-danger" href="<?= BASE_URL ?>/modules/auth/logout.php"><i class="bi bi-box-arrow-right me-2"></i> Sign Out</a></li>
