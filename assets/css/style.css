@@ -1,0 +1,2542 @@
+/* assets/css/style.css - Kansan Manpower Modern Enterprise Styling */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --primary-light: #eef2ff;
+    --secondary: #64748b;
+    --sidebar-bg: #0f172a;
+    --sidebar-hover: #1e293b;
+    --sidebar-active: #334155;
+    --sidebar-text: #94a3b8;
+    --sidebar-text-active: #ffffff;
+    --topbar-bg: #ffffff;
+    --card-bg: #ffffff;
+    --body-bg: #f8fafc;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--body-bg);
+    color: var(--text-main);
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+/* App Wrapper Layout */
+.app-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar - Permanently Fixed on screen, NEVER scrolls with page */
+.app-sidebar {
+    width: 270px;
+    background-color: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    transition: margin-left 0.3s ease, left 0.3s ease;
+    z-index: 1035;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: 100vh;
+    max-height: 100vh;
+    overflow-y: hidden;
+}
+
+.sidebar-brand {
+    padding: 1.25rem 1.5rem;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #ffffff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+}
+
+.sidebar-brand .brand-badge {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+}
+
+.sidebar-nav {
+    padding: 1rem 0.75rem;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.sidebar-heading {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.075em;
+    color: #64748b;
+    font-weight: 700;
+    padding: 0.75rem 0.75rem 0.35rem 0.75rem;
+}
+
+.nav-link-custom {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.85rem;
+    color: var(--sidebar-text);
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    margin-bottom: 2px;
+}
+
+.nav-link-custom:hover {
+    background-color: var(--sidebar-hover);
+    color: #ffffff;
+}
+
+.nav-link-custom.active {
+    background: linear-gradient(90deg, #4f46e5, #6366f1);
+    color: #ffffff;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+}
+
+.nav-link-custom i {
+    font-size: 1.1rem;
+    width: 22px;
+    text-align: center;
+}
+
+/* Main Content Area */
+.app-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 100vh;
+    margin-left: 270px;
+    width: calc(100% - 270px);
+    transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+@media (max-width: 991.98px) {
+    .app-main {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+}
+
+/* Top Navbar */
+.app-topbar {
+    background-color: var(--topbar-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.85rem 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow-sm);
+    position: sticky;
+    top: 0;
+    z-index: 1030; /* Header stays above all scrolling page contents */
+}
+
+.page-container {
+    padding: 1.75rem;
+    flex: 1;
+}
+
+/* Metric Cards */
+.metric-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    height: 100%;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.metric-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+}
+
+.metric-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.25rem;
+}
+
+.metric-value {
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.2;
+}
+
+/* Cards & Tables */
+.custom-card {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+
+.custom-card-header {
+    padding: 1rem 1.5rem;
+    background: #ffffff;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+/* ==========================================================================
+   AUTHENTIC EXCEL / SPREADSHEET TABLE GRID SYSTEM (GLOBAL)
+   Transforms all system tables into clean, dense, readable Excel-style sheets
+   ========================================================================== */
+.table-responsive {
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.table-custom {
+    margin-bottom: 0;
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.78rem;
+}
+
+/* Excel Grid Column Headers */
+.table-custom thead th {
+    background-color: #f1f5f9;
+    color: #334155;
+    font-weight: 700;
+    font-size: 0.70rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border: 1px solid #cbd5e1;
+    border-bottom: 2px solid #94a3b8;
+    padding: 0.42rem 0.65rem;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Excel Grid Cells */
+.table-custom tbody td {
+    padding: 0.38rem 0.65rem;
+    vertical-align: middle;
+    font-size: 0.78rem;
+    border: 1px solid #e2e8f0;
+    line-height: 1.35;
+    background-color: #ffffff;
+}
+
+/* Alternating Zebra Rows */
+.table-custom tbody tr:nth-child(even) td {
+    background-color: #f8fafc;
+}
+
+/* Excel Row Selection / Hover Highlight */
+.table-custom tbody tr:hover td {
+    background-color: #eff6ff !important; /* Soft blue excel cell highlight */
+}
+
+/* Excel Row Number Index Column (1, 2, 3...) */
+.table-custom th.col-row-num,
+.table-custom td.col-row-num {
+    width: 38px;
+    min-width: 38px;
+    max-width: 45px;
+    text-align: center;
+    background-color: #f1f5f9 !important;
+    color: #64748b;
+    font-weight: 700;
+    font-size: 0.68rem;
+    font-family: var(--font-mono, monospace);
+    user-select: none;
+    border-right: 1px solid #cbd5e1;
+}
+
+.table-custom tbody tr:hover td.col-row-num {
+    background-color: #e2e8f0 !important;
+    color: #0f172a;
+}
+
+/* Excel Summary / Footer Row */
+.table-custom tfoot td {
+    background: #f8fafc;
+    border-top: 2px solid #94a3b8;
+    border-bottom: 1px solid #cbd5e1;
+    border-right: 1px solid #cbd5e1;
+    border-left: 1px solid #cbd5e1;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.78rem;
+    position: sticky;
+    bottom: 0;
+    z-index: 4;
+}
+
+/* Custom Badges */
+.badge-purple,
+.bg-purple-subtle {
+    background-color: #f3e8ff !important;
+}
+
+.text-purple-emphasis {
+    color: #581c87 !important;
+    font-weight: 600;
+}
+
+.border-purple-subtle {
+    border-color: #c084fc !important;
+}
+
+.badge-night-shift {
+    background-color: #f3e8ff !important;
+    color: #581c87 !important;
+    border: 1px solid #c084fc !important;
+    font-weight: 600;
+}
+
+/* Modern Form Controls */
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    padding: 0.55rem 0.85rem;
+    font-size: 0.88rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #4f46e5, #4338ca);
+    border: none;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 0.55rem 1.15rem;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #4338ca, #3730a3);
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25);
+}
+
+.transition-hover {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.transition-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+.sub-nav-wrapper::-webkit-scrollbar {
+    height: 4px;
+}
+.sub-nav-wrapper::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+
+/* Invoice Printable Styling */
+@media print {
+    .app-sidebar, .app-topbar, .no-print, .btn, footer {
+        display: none !important;
+    }
+    .app-wrapper, .app-main, .page-container {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: #ffffff !important;
+    }
+    .custom-card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+}
+
+/* Mobile responsive toggles */
+@media (max-width: 991.98px) {
+    .app-sidebar {
+        position: fixed !important;
+        left: -270px !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        margin-left: 0 !important;
+        z-index: 1045 !important;
+    }
+    .app-sidebar.show {
+        left: 0 !important;
+    }
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 1040;
+    }
+    .sidebar-overlay.show {
+        display: block;
+    }
+}
+
+/* Force hiding utility for specific interactive elements */
+.modal-staff-item.d-none,
+.staff-row-card.d-none {
+    display: none !important;
+}
+
+/* Site-Centric Mobile Command Center Styling */
+.site-command-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    transition: all 0.25s ease;
+    overflow: hidden;
+}
+
+.site-command-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 8px 16px -4px rgba(0,0,0,0.06);
+}
+
+.site-command-header {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border-bottom: 1px solid #e2e8f0;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+}
+
+.site-staff-list {
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+}
+
+.staff-touch-item {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.staff-touch-item:hover {
+    border-color: #cbd5e1;
+    background: #fafafa;
+}
+
+/* Large, thumb-friendly buttons for phone users */
+.btn-touch {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    border-radius: 8px;
+    touch-action: manipulation;
+}
+
+.btn-group-touch .btn {
+    min-height: 38px;
+    min-width: 44px;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 575.98px) {
+    .site-command-header {
+        padding: 0.85rem 1rem;
+    }
+    
+    .staff-touch-item {
+        padding: 0.65rem 0.75rem;
+    }
+
+    .btn-group-touch .btn {
+        min-height: 42px;
+        min-width: 48px;
+        font-size: 0.9rem;
+    }
+    
+    .date-pill-nav {
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 4px;
+    }
+}
+
+/* High-Density 6-Card Operational Grid */
+.site-command-grid-6 {
+    display: grid !important;
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    gap: 0.75rem;
+}
+@media (max-width: 1399.98px) {
+    .site-command-grid-6 {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+@media (max-width: 991.98px) {
+    .site-command-grid-6 {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+@media (max-width: 575.98px) {
+    .site-command-grid-6 {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+.site-card-compact {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.site-card-compact .site-command-header {
+    padding: 0.85rem;
+}
+
+.site-card-compact .staff-touch-item {
+    padding: 0.5rem 0.65rem;
+}
+
+.site-card-compact .btn-group-touch .btn {
+    min-height: 32px;
+    min-width: 32px;
+    padding: 2px 6px;
+    font-size: 0.78rem;
+}
+
+/* Settings Reorganization Tabs Styling */
+.settings-nav-card .nav-pills {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.settings-nav-card .nav-pills .nav-link {
+    color: #475569;
+    font-weight: 500;
+    border-radius: 12px;
+    padding: 0.75rem 0.85rem;
+    transition: all 0.2s ease;
+    border: 1px solid #f1f5f9;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    text-align: left;
+}
+.settings-nav-card .nav-pills .nav-link:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #0f172a;
+    transform: translateX(2px);
+}
+.settings-nav-card .nav-pills .nav-link .nav-icon-box {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+}
+.settings-nav-card .nav-pills .nav-link.active {
+    background: #4f46e5 !important;
+    border-color: #4338ca !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3) !important;
+}
+.settings-nav-card .nav-pills .nav-link.active .nav-icon-box {
+    background: rgba(255, 255, 255, 0.22) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    color: #ffffff !important;
+}
+.settings-nav-card .nav-pills .nav-link.active .nav-icon-box i {
+    color: #ffffff !important;
+}
+.settings-nav-card .nav-pills .nav-link.active .tab-title {
+    color: #ffffff !important;
+}
+.settings-nav-card .nav-pills .nav-link.active .tab-subtitle {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Responsive Sticky & Z-Index Control for Settings Left Nav */
+@media (min-width: 992px) {
+    .settings-nav-card {
+        position: sticky !important;
+        top: 80px !important;
+        z-index: 15 !important;
+    }
+}
+@media (max-width: 991.98px) {
+    .settings-nav-card {
+        position: static !important;
+        top: auto !important;
+        z-index: 1 !important;
+    }
+}
+
+/* Modal Solid Background & Contrast */
+.modal-content {
+    background-color: #ffffff !important;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ==========================================================================
+   Dashboard Quick Action Cards (Desktop Baseline)
+   ========================================================================== */
+.quick-action-card {
+    border-radius: 10px;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.quick-action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08) !important;
+}
+.quick-card-inner {
+    display: flex;
+    align-items: center;
+}
+.quick-action-card .quick-icon-box {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    border-radius: 8px;
+}
+.quick-action-card .quick-card-text {
+    min-width: 0;
+    flex: 1;
+}
+.quick-action-card .quick-label {
+    display: block;
+    font-size: 0.72rem;
+    color: #64748b;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    line-height: 1.2;
+    margin-bottom: 2px;
+}
+.quick-action-card .quick-title {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.d-title-desktop {
+    display: inline;
+}
+.d-title-mobile {
+    display: none;
+}
+
+/* Site Operations Controls Visibility - Desktop Default */
+.site-ops-mobile-controls {
+    display: none !important;
+}
+.site-ops-mobile-view-switcher {
+    display: none !important;
+}
+.site-ops-desktop-controls {
+    display: flex !important;
+}
+
+/* Mobile Ultra-Compact Operations Dashboard */
+@media (max-width: 767.98px) {
+    .page-container {
+        padding: 0.65rem 0.65rem !important;
+    }
+
+    /* Welcome Header */
+    .dash-welcome-title {
+        font-size: 1.05rem !important;
+    }
+    .dash-welcome-sub {
+        font-size: 0.72rem !important;
+    }
+    .dash-deploy-btn {
+        padding: 0.35rem 0.75rem !important;
+        font-size: 0.76rem !important;
+        width: 100% !important;
+    }
+
+    /* 4 Quick Action Cards in 1 Single Line */
+    .quick-actions-row {
+        margin-left: -0.25rem !important;
+        margin-right: -0.25rem !important;
+    }
+    .quick-actions-row > [class*="col-"] {
+        padding-left: 0.2rem !important;
+        padding-right: 0.2rem !important;
+    }
+    .quick-action-card {
+        padding: 0.45rem 0.2rem !important;
+        border-radius: 8px !important;
+        border-left: none !important;
+        border-top: 3px solid !important;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+    }
+    .quick-action-card.border-primary { border-top-color: #3b82f6 !important; }
+    .quick-action-card.border-success { border-top-color: #10b981 !important; }
+    .quick-action-card.border-info { border-top-color: #06b6d4 !important; }
+    .quick-action-card.border-warning { border-top-color: #f59e0b !important; }
+
+    .quick-card-inner {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        gap: 0.25rem !important;
+    }
+    .quick-action-card .quick-icon-box {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 0.85rem !important;
+        border-radius: 6px !important;
+        margin-bottom: 2px !important;
+    }
+    .quick-action-card .quick-card-text {
+        text-align: center !important;
+        width: 100% !important;
+    }
+    .quick-action-card .quick-label {
+        display: none !important;
+    }
+    .quick-action-card .quick-title {
+        display: block !important;
+        font-size: 0.68rem !important;
+        line-height: 1.15 !important;
+        font-weight: 700 !important;
+        text-align: center !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+    .d-title-desktop {
+        display: none !important;
+    }
+    .d-title-mobile {
+        display: inline !important;
+    }
+
+    /* Site Operations Controls Visibility - Mobile */
+    .site-ops-mobile-controls {
+        display: flex !important;
+    }
+    .site-ops-mobile-view-switcher {
+        display: inline-flex !important;
+    }
+    .site-ops-desktop-controls {
+        display: none !important;
+    }
+
+    /* Live Shift Banner */
+    .live-shift-banner {
+        padding: 0.6rem 0.75rem !important;
+        border-radius: 10px !important;
+    }
+    .live-shift-banner .shift-icon-box {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 0.95rem !important;
+    }
+    .live-shift-banner .shift-heading {
+        font-size: 0.84rem !important;
+        line-height: 1.25 !important;
+    }
+    .live-shift-banner .shift-badge {
+        font-size: 0.6rem !important;
+        padding: 0.15rem 0.35rem !important;
+    }
+    .live-shift-banner .shift-stats-row {
+        width: 100% !important;
+        gap: 0.35rem !important;
+    }
+    .live-shift-banner .shift-stat-box {
+        background: rgba(255, 255, 255, 0.12) !important;
+        border-radius: 6px !important;
+        padding: 0.25rem 0.4rem !important;
+        text-align: center !important;
+        flex: 1 1 0 !important;
+    }
+    .live-shift-banner .shift-stat-val {
+        font-size: 0.85rem !important;
+        font-weight: 700 !important;
+        line-height: 1.1 !important;
+    }
+    .live-shift-banner .shift-stat-lbl {
+        font-size: 0.58rem !important;
+        color: rgba(255, 255, 255, 0.7) !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.02em !important;
+        margin-bottom: 2px !important;
+    }
+
+    /* Sites & Workforce Header */
+    .site-ops-header {
+        padding: 0.5rem 0.65rem !important;
+    }
+    .site-ops-title {
+        font-size: 0.86rem !important;
+    }
+    .site-ops-badge {
+        font-size: 0.62rem !important;
+        padding: 0.1rem 0.35rem !important;
+    }
+    .site-ops-controls {
+        width: 100% !important;
+    }
+
+    /* Site Command Cards on Mobile */
+    .site-command-grid-6 {
+        gap: 0.5rem !important;
+    }
+    .site-card-compact .site-command-header {
+        padding: 0.65rem 0.75rem !important;
+    }
+    .site-card-compact .staff-touch-item {
+        padding: 0.4rem 0.55rem !important;
+    }
+}
+
+/* ==========================================================================
+   Spreadsheet-Style Staff Deployment & Drag-Drop Matrix Hub
+   ========================================================================== */
+.matrix-workbench {
+    background-color: #f8fafc;
+    border-radius: 12px;
+}
+
+/* KPI Summary Cards */
+.matrix-kpi-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.matrix-kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+.matrix-kpi-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+.matrix-kpi-val {
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
+.matrix-kpi-lbl {
+    font-size: 0.72rem;
+    color: #64748b;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+/* Left Panel: Spreadsheet Table */
+.matrix-staff-table-wrap {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.matrix-staff-table {
+    margin-bottom: 0;
+    font-size: 0.82rem;
+}
+.matrix-staff-table thead th {
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    padding: 0.65rem 0.75rem;
+    border-bottom: 2px solid #cbd5e1;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
+.matrix-staff-row {
+    cursor: grab;
+    transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+.matrix-staff-row:hover {
+    background-color: #f8fafc;
+}
+.matrix-staff-row.dragging {
+    opacity: 0.45;
+    background-color: #e0e7ff !important;
+    border: 1px dashed #4f46e5 !important;
+    cursor: grabbing;
+}
+.matrix-staff-row.is-deployed {
+    background-color: #f0fdf4;
+}
+.matrix-staff-row.is-leave {
+    background-color: #fffbeb;
+}
+.matrix-staff-row td {
+    padding: 0.55rem 0.75rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+/* Drag Grip Handle */
+.drag-grip {
+    cursor: grab;
+    color: #94a3b8;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    user-select: none;
+}
+.drag-grip:hover {
+    color: #4f46e5;
+}
+
+/* 1-Click Availability Toggle Button */
+.btn-toggle-avail {
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.2rem 0.55rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: all 0.15s ease;
+    border: 1px solid transparent;
+}
+.btn-toggle-avail.state-available {
+    background-color: #ecfdf5;
+    color: #059669;
+    border-color: #a7f3d0;
+}
+.btn-toggle-avail.state-available:hover {
+    background-color: #d1fae5;
+    color: #047857;
+}
+.btn-toggle-avail.state-disabled {
+    background-color: #fef2f2;
+    color: #dc2626;
+    border-color: #fecaca;
+}
+.btn-toggle-avail.state-disabled:hover {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+/* Smart Leave Badge & Button */
+.leave-pill-badge {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+    border-radius: 6px;
+    padding: 0.18rem 0.45rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+.btn-leave-action {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+}
+
+/* Right Panel: Client Venue Drop Zone Cards */
+.matrix-venue-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+.matrix-venue-card.drag-over {
+    border: 2px dashed #4f46e5 !important;
+    background-color: #eef2ff !important;
+    box-shadow: 0 8px 24px rgba(79, 70, 229, 0.18) !important;
+    transform: scale(1.01);
+}
+.matrix-venue-header {
+    background: #ffffff;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+.matrix-drop-area {
+    min-height: 105px;
+    padding: 0.65rem;
+    background: #f8fafc;
+    border: 2px dashed #cbd5e1;
+    border-radius: 8px;
+    margin: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    transition: all 0.15s ease;
+}
+.matrix-drop-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+    height: 75px;
+    user-select: none;
+    pointer-events: none;
+}
+.matrix-drop-placeholder i {
+    font-size: 1.3rem;
+    margin-bottom: 0.2rem;
+    color: #cbd5e1;
+}
+
+/* Assigned Staff Chip inside Venue Card */
+.venue-staff-chip {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.4rem 0.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    transition: all 0.15s ease;
+}
+.venue-staff-chip:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+.btn-unassign-chip {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: none;
+    background: #f1f5f9;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.btn-unassign-chip:hover {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+/* Full Spreadsheet Mode Styling */
+.excel-grid-table thead th {
+    background: #0f172a;
+    color: #f8fafc;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.75rem 0.85rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+.excel-grid-table td {
+    padding: 0.6rem 0.85rem;
+    vertical-align: middle;
+}
+.excel-grid-table tr:hover td {
+    background-color: #f8fafc;
+}
+
+/* Floating Action Toast */
+.matrix-toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+}
+
+/* ==========================================================================
+   Desktop Sidebar Collapse Rules
+   ========================================================================== */
+@media (min-width: 992px) {
+    body.sidebar-collapsed .app-sidebar {
+        margin-left: -270px;
+    }
+    body.sidebar-collapsed .app-main {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+
+/* ==========================================================================
+   AUTHENTIC EXCEL-GRID DEPLOYMENT HUB (85% GRID + 15% RIGHT CLIENT STACK)
+   ========================================================================== */
+.excel-deploy-layout {
+    display: flex;
+    gap: 0.65rem;
+    align-items: flex-start;
+    width: 100%;
+}
+
+/* 100% Full-Width Authentic Excel Canvas */
+.excel-matrix-canvas {
+    flex: 1 1 100%;
+    width: 100%;
+    min-width: 0;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+/* Excel Shift Subheading Cell inside Client Columns */
+.excel-shift-subheading-td {
+    background: #e2e8f0 !important;
+    color: #1e293b !important;
+    font-size: 0.70rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+    padding: 0.35rem 0.5rem !important;
+    border-top: 2px solid #94a3b8 !important;
+    border-bottom: 2px solid #94a3b8 !important;
+    border-left: 1px solid #cbd5e1 !important;
+    border-right: 1px solid #cbd5e1 !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    height: 30px !important;
+    vertical-align: middle !important;
+}
+
+/* Excel Shift Spacer Cell ("ek cell chhodkar") */
+.excel-shift-spacer-td {
+    background: #f1f5f9 !important;
+    border: 1px solid #e2e8f0 !important;
+    height: 24px !important;
+    min-height: 24px !important;
+    padding: 0 !important;
+}
+
+.excel-sheet-header-bar {
+    background: #f8fafc;
+    border-bottom: 2px solid #cbd5e1;
+    padding: 0.4rem 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Authentic Excel Matrix Table */
+.excel-table-scroll {
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    max-height: calc(100vh - 215px);
+    min-height: 520px;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f8fafc;
+}
+
+.excel-table-scroll::-webkit-scrollbar {
+    height: 9px;
+    width: 8px;
+}
+
+.excel-table-scroll::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+.excel-table-scroll::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.excel-table-scroll::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.excel-dense-table {
+    border-collapse: collapse;
+    width: max-content;
+    min-width: 100%;
+    margin-bottom: 0;
+    background: #ffffff;
+}
+
+.excel-dense-table th {
+    background: #f1f5f9;
+    color: #334155;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-align: center;
+    letter-spacing: 0.04em;
+    padding: 0.35rem 0.5rem;
+    border: 1px solid #cbd5e1;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    user-select: none;
+    min-width: 165px;
+    white-space: nowrap;
+}
+
+.excel-dense-table td {
+    border: 1px solid #cbd5e1;
+    padding: 0;
+    vertical-align: middle;
+    height: 32px;
+    background: #ffffff;
+    min-width: 165px;
+    white-space: nowrap;
+}
+
+/* Excel Empty Cell (Click to Quick-Add Staff & Droppable Target) */
+.excel-empty-cell {
+    cursor: pointer !important;
+    transition: background-color 0.15s ease, outline 0.15s ease;
+    position: relative;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.excel-empty-cell:hover {
+    background-color: #f0fdf4 !important;
+    outline: 2px dashed #16a34a !important;
+    z-index: 4;
+}
+
+.excel-empty-cell:hover::after {
+    content: '+ Add Staff';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #16a34a;
+    pointer-events: none;
+    letter-spacing: 0.02em;
+    background: #f0fdf4;
+    padding: 1px 6px;
+    border-radius: 4px;
+}
+
+/* Excel Staff Cell */
+.excel-staff-cell {
+    height: 100%;
+    width: 100%;
+    padding: 0.3rem 0.45rem;
+    font-size: 0.76rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.3rem;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    touch-action: none;
+    transition: background-color 0.12s ease, outline 0.12s ease;
+    outline: 1px solid transparent;
+}
+
+.excel-staff-cell * {
+    pointer-events: none;
+}
+
+.excel-staff-cell:hover {
+    outline: 2px solid #2563eb;
+    z-index: 5;
+    position: relative;
+}
+
+.excel-staff-cell.dragging {
+    opacity: 0.45 !important;
+    outline: 2px dashed #4f46e5 !important;
+    background-color: #f1f5f9 !important;
+    transition: none !important;
+}
+
+/* Status Cell Color Variants (Single solid color per venue/shift status) */
+/* 1. Standard Available cell */
+.excel-staff-cell.status-available {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+}
+
+/* 2. Scheduled / Pending Attendance (Solid Soft Bright Yellow) */
+.excel-staff-cell.status-deployed,
+.excel-staff-cell.status-scheduled {
+    background-color: #fef08a !important; /* Soft bright yellow */
+    color: #713f12 !important;
+    border: 1px solid #facc15 !important;
+}
+.excel-staff-cell.status-deployed span:not(.badge),
+.excel-staff-cell.status-scheduled span:not(.badge) {
+    color: #713f12 !important;
+}
+.excel-staff-cell.status-deployed:hover,
+.excel-staff-cell.status-scheduled:hover {
+    background-color: #fde047 !important;
+}
+
+/* 2B. Verified Present / Ongoing Cell (Rich Green background with Crisp White text) */
+.excel-staff-cell.status-present,
+.excel-staff-cell.status-ongoing {
+    background-color: #16a34a !important; /* Green */
+    color: #ffffff !important;
+    border: 1px solid #15803d !important;
+    font-weight: 600;
+}
+.excel-staff-cell.status-present span:not(.badge),
+.excel-staff-cell.status-ongoing span:not(.badge) {
+    color: #ffffff !important;
+}
+.excel-staff-cell.status-present:hover,
+.excel-staff-cell.status-ongoing:hover {
+    background-color: #15803d !important;
+    color: #ffffff !important;
+}
+
+/* 2C. Completed Shift Cell (Royal Blue background with Crisp White text) */
+.excel-staff-cell.status-completed {
+    background-color: #2563eb !important; /* Royal Blue */
+    color: #ffffff !important;
+    border: 1px solid #1d4ed8 !important;
+    font-weight: 600;
+}
+.excel-staff-cell.status-completed span:not(.badge) {
+    color: #ffffff !important;
+}
+.excel-staff-cell.status-completed:hover {
+    background-color: #1d4ed8 !important;
+    color: #ffffff !important;
+}
+
+/* 2D. Half-Day Cell (Solid Amber/Orange background with Crisp White text) */
+.excel-staff-cell.status-half-day,
+.excel-staff-cell.status-halfday {
+    background-color: #f59e0b !important; /* Amber / Orange */
+    color: #ffffff !important;
+    border: 1px solid #d97706 !important;
+    font-weight: 600;
+}
+.excel-staff-cell.status-half-day span:not(.badge),
+.excel-staff-cell.status-halfday span:not(.badge) {
+    color: #ffffff !important;
+}
+.excel-staff-cell.status-half-day:hover,
+.excel-staff-cell.status-halfday:hover {
+    background-color: #d97706 !important;
+    color: #ffffff !important;
+}
+
+/* 2E. Absent Cell (Solid Red background with Crisp White text) */
+.excel-staff-cell.status-absent {
+    background-color: #ef4444 !important; /* Red */
+    color: #ffffff !important;
+    border: 1px solid #dc2626 !important;
+    font-weight: 600;
+}
+.excel-staff-cell.status-absent span:not(.badge) {
+    color: #ffffff !important;
+}
+.excel-staff-cell.status-absent:hover {
+    background-color: #dc2626 !important;
+    color: #ffffff !important;
+}
+
+/* 2F. Guaranteed Crisp White Text for Blue, Green, Multi-Shift and Gradient Cells */
+.excel-staff-cell.status-completed,
+.excel-staff-cell.status-present,
+.excel-staff-cell.status-ongoing,
+.excel-staff-cell.status-multi-shift,
+.excel-staff-cell.status-half-day,
+.excel-staff-cell.status-halfday,
+.excel-staff-cell.status-absent,
+.excel-staff-cell[style*="#2563eb"],
+.excel-staff-cell[style*="2563eb"],
+.excel-staff-cell[style*="#16a34a"],
+.excel-staff-cell[style*="16a34a"],
+.excel-staff-cell[style*="linear-gradient"] {
+    color: #ffffff !important;
+}
+
+.excel-staff-cell.status-completed span:not(.badge),
+.excel-staff-cell.status-present span:not(.badge),
+.excel-staff-cell.status-ongoing span:not(.badge),
+.excel-staff-cell.status-multi-shift span:not(.badge),
+.excel-staff-cell.status-half-day span:not(.badge),
+.excel-staff-cell.status-halfday span:not(.badge),
+.excel-staff-cell.status-absent span:not(.badge),
+.excel-staff-cell[style*="#2563eb"] span:not(.badge),
+.excel-staff-cell[style*="2563eb"] span:not(.badge),
+.excel-staff-cell[style*="#16a34a"] span:not(.badge),
+.excel-staff-cell[style*="16a34a"] span:not(.badge),
+.excel-staff-cell[style*="linear-gradient"] span:not(.badge) {
+    color: #ffffff !important;
+}
+
+/* 3. Magenta / Pink cell (On Leave / Disabled - matching user screenshot) */
+.excel-staff-cell.status-leave {
+    background-color: #fbcfe8 !important; /* Magenta/Pink from user screenshot */
+    color: #831843 !important;
+    cursor: not-allowed;
+    -webkit-user-drag: none;
+}
+
+/* Unified Legend & KPI Indicators */
+.legend-kpi-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.18rem 0.5rem;
+    border-radius: 5px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    font-size: 0.70rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    user-select: none;
+    line-height: 1.2;
+}
+
+.legend-color-box {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.legend-kpi-pill.legend-pill-ready {
+    border-color: #cbd5e1;
+}
+
+.legend-kpi-pill.legend-pill-deployed {
+    background: #fefce8;
+    border-color: #fde047;
+}
+
+.legend-kpi-pill.legend-pill-present {
+    background: #f0fdf4;
+    border-color: #86efac;
+}
+
+.legend-kpi-pill.legend-pill-leave {
+    background: #fdf2f8;
+    border-color: #f472b6;
+}
+
+/* 17% Right Client Card Container (Matching Excel Canvas Card) */
+.client-panel-card {
+    width: 18%;
+    min-width: 260px;
+    max-width: 320px;
+    flex-shrink: 0;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.client-panel-header-bar {
+    background: #f8fafc;
+    border-bottom: 1px solid #cbd5e1;
+    height: 38px;
+    min-height: 38px;
+    padding: 0 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.client-cards-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    background: #f8fafc;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f8fafc;
+}
+
+.client-cards-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+.client-cards-scroll::-webkit-scrollbar-track {
+    background: #f8fafc;
+}
+.client-cards-scroll::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+/* Client Accordion Cards */
+.client-accordion-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    overflow: hidden;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.client-accordion-card:hover {
+    border-color: #94a3b8;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.client-accordion-card.has-deployed {
+    border-left: 3px solid #2563eb !important;
+}
+
+.client-accordion-card.is-expanded {
+    border-color: #3b82f6;
+    box-shadow: 0 3px 8px rgba(37,99,235,0.08);
+}
+
+.client-accordion-card.drag-over {
+    border: 2px dashed #2563eb !important;
+    background-color: #eff6ff !important;
+    transform: scale(1.01);
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.2) !important;
+}
+
+.client-accordion-card.drag-over * {
+    pointer-events: none;
+}
+
+.client-card-header {
+    padding: 0.45rem 0.55rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    background: #ffffff;
+    user-select: none;
+    transition: background 0.12s ease;
+}
+
+.client-card-header:hover {
+    background: #f8fafc;
+}
+
+.client-accordion-card.is-expanded .client-card-header {
+    background: #eff6ff;
+    border-bottom: 1px solid #dbeafe;
+}
+
+.client-card-title {
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.25;
+}
+
+.client-card-sub {
+    font-size: 0.65rem;
+    color: #64748b;
+    line-height: 1.2;
+}
+
+.client-count-pill {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.1rem 0.45rem;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    line-height: 1.2;
+}
+
+.client-count-pill.active {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.client-count-pill.empty {
+    background: #f1f5f9;
+    color: #94a3b8;
+    border: 1px solid #e2e8f0;
+}
+
+.client-chevron {
+    font-size: 0.65rem;
+    color: #94a3b8;
+    transition: transform 0.18s ease;
+}
+
+.client-accordion-card.is-expanded .client-chevron {
+    transform: rotate(180deg);
+    color: #2563eb;
+}
+
+.client-empty-drop-hint {
+    color: #94a3b8;
+    text-align: center;
+    padding: 0.45rem 0.2rem;
+    font-size: 0.68rem;
+    font-style: italic;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 4px;
+}
+
+.client-card-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.12rem 0.4rem;
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.client-accordion-body {
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    padding: 0.4rem;
+    display: none;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.client-accordion-card.is-expanded .client-accordion-body {
+    display: flex;
+}
+
+.client-accordion-card.is-expanded {
+    border-color: #94a3b8;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+}
+
+.client-accordion-card.is-expanded .client-card-chevron {
+    transform: rotate(180deg);
+}
+
+.client-card-chevron {
+    transition: transform 0.18s ease;
+    font-size: 0.68rem;
+    color: #94a3b8;
+}
+
+/* Deployed staff item inside expanded client card */
+.client-staff-item {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    padding: 0.25rem 0.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.72rem;
+}
+
+.client-staff-item .staff-name {
+    font-weight: 700;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 125px;
+}
+
+.client-staff-unassign {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: none;
+    background: #fee2e2;
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.12s ease;
+}
+
+.client-staff-unassign:hover {
+    background: #dc2626;
+    color: #ffffff;
+}
+
+/* Floating Cell Action Menu (Context Popover on click) */
+.cell-action-popover {
+    position: fixed;
+    z-index: 9999;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2), 0 8px 10px -6px rgba(0,0,0,0.1);
+    width: 275px;
+    padding: 0.65rem;
+    display: none;
+}
+
+/* ==========================================================================
+   FLUSH BOTTOM / FOOTER GAP ELIMINATION & FULL VIEWPORT EXTENSION
+   ========================================================================== */
+.deploy-page-view .page-container {
+    padding: 0.4rem 0.65rem 0.15rem 0.65rem !important;
+    display: flex;
+    flex-direction: column;
+}
+
+.deploy-page-view .excel-deploy-layout {
+    flex: 1;
+    height: calc(100vh - 128px) !important;
+    max-height: calc(100vh - 128px) !important;
+    min-height: 520px;
+    margin-bottom: 0.25rem;
+}
+
+.deploy-page-view .excel-matrix-canvas,
+.deploy-page-view .client-panel-card {
+    height: 100% !important;
+}
+
+.deploy-page-view .excel-table-scroll {
+    height: calc(100% - 38px) !important;
+    max-height: calc(100% - 38px) !important;
+    flex: 1;
+}
+
+.deploy-page-view .client-cards-scroll {
+    height: calc(100% - 38px) !important;
+    max-height: calc(100% - 38px) !important;
+}
+
+.deploy-page-view footer {
+    padding: 0.35rem 1rem !important;
+    font-size: 0.75rem !important;
+    margin-top: auto;
+}
+
+/* ==========================================================================
+   AUTHENTIC GOOGLE SHEET GROUP COLUMN HEADERS (RED BOLD)
+   ========================================================================== */
+.excel-dense-table th.excel-group-th {
+    background: #ffffff !important;
+    color: #dc2626 !important; /* Authentic bold red text from user reference sheet */
+    font-size: 0.74rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.45rem 0.65rem;
+    border: 1px solid #cbd5e1;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    user-select: none;
+    transition: background-color 0.15s ease, outline 0.15s ease;
+    line-height: 1.25;
+    min-width: 165px;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.excel-dense-table th.excel-group-th .group-count-pill {
+    font-size: 0.62rem;
+    font-weight: 700;
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 0.1rem 0.35rem;
+    border-radius: 10px;
+    margin-left: 0.35rem;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.excel-dense-table th.excel-group-th .group-header-menu-btn {
+    opacity: 0.45;
+    transition: opacity 0.15s ease, color 0.15s ease;
+    cursor: pointer;
+    font-size: 0.72rem;
+    line-height: 1;
+    border: none;
+    background: transparent;
+    padding: 0.1rem 0.25rem;
+    color: #64748b;
+}
+
+.excel-dense-table th.excel-group-th:hover .group-header-menu-btn,
+.excel-dense-table th.excel-group-th .group-header-menu-btn:focus,
+.excel-dense-table th.excel-group-th .dropdown.show .group-header-menu-btn {
+    opacity: 1;
+    color: #dc2626 !important;
+}
+
+/* Drag-over column highlight during inter-group drag */
+.excel-dense-table th.excel-group-th.drag-over-group {
+    background: #fee2e2 !important;
+    outline: 2px dashed #dc2626 !important;
+    outline-offset: -2px;
+    color: #991b1b !important;
+}
+
+.excel-dense-table td.drag-over-cell,
+.excel-dense-table td.excel-staff-td.drag-over-cell {
+    background: #fef2f2 !important;
+    outline: 2px dashed #ef4444 !important;
+    outline-offset: -2px;
+}
+
+.excel-dense-table td.drag-over-cell .excel-staff-cell {
+    opacity: 0.75;
+}
+
+/* ==========================================================================
+   AUTHENTIC RIGHT-CLICK EXCEL CONTEXT MENU (CHANGE GROUP & QUICK ACTIONS)
+   ========================================================================== */
+.excel-rightclick-menu {
+    position: fixed;
+    z-index: 10000;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    min-width: 210px;
+    padding: 0.35rem 0;
+    font-size: 0.75rem;
+    display: none;
+    user-select: none;
+    animation: fadeInMenu 0.1s ease-out;
+}
+
+@keyframes fadeInMenu {
+    from { opacity: 0; transform: scale(0.97); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+.excel-rc-header {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.68rem;
+    font-weight: 800;
+    color: #64748b;
+    border-bottom: 1px solid #f1f5f9;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: #f8fafc;
+}
+
+.excel-rc-item {
+    padding: 0.38rem 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    color: #1e293b;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.1s ease, color 0.1s ease;
+    font-weight: 600;
+}
+
+.excel-rc-item:hover {
+    background: #f1f5f9;
+    color: #4f46e5;
+}
+
+.excel-rc-item.rc-danger:hover {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.excel-rc-divider {
+    height: 1px;
+    background: #f1f5f9;
+    margin: 0.25rem 0;
+}
+
+/* Submenu for Change Group */
+.excel-rc-has-submenu {
+    position: relative;
+}
+
+.excel-rc-submenu {
+    position: absolute;
+    left: 100%;
+    top: -4px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+    min-width: 190px;
+    max-height: 280px;
+    overflow-y: auto;
+    padding: 0.35rem 0;
+    display: none;
+    z-index: 10001;
+}
+
+.excel-rc-has-submenu:hover .excel-rc-submenu {
+    display: block;
+}
+
+.excel-rc-submenu .excel-rc-item {
+    font-size: 0.72rem;
+    padding: 0.32rem 0.7rem;
+}
+
+/* ==========================================================================
+   AUTHENTIC EXCEL CELL LOOK FOR ROSTER & DATA TABLES
+   ========================================================================== */
+.excel-roster-card {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.excel-roster-header-bar {
+    background: #f8fafc;
+    border-bottom: 2px solid #cbd5e1;
+    padding: 0.45rem 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.excel-roster-table-scroll {
+    overflow-x: auto;
+    background: #ffffff;
+}
+
+.excel-roster-table {
+    border-collapse: collapse !important;
+    width: 100%;
+    margin-bottom: 0;
+    background: #ffffff;
+    font-size: 0.76rem;
+}
+
+.excel-roster-table th {
+    background: #f1f5f9 !important;
+    color: #334155 !important;
+    font-size: 0.70rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid #cbd5e1 !important;
+    vertical-align: middle;
+    white-space: nowrap;
+    user-select: none;
+    text-align: left;
+}
+
+.excel-roster-table td {
+    border: 1px solid #cbd5e1 !important;
+    padding: 0.35rem 0.55rem;
+    vertical-align: middle;
+    background: #ffffff;
+    color: #0f172a;
+    transition: background-color 0.1s ease;
+}
+
+/* Row numbers column (#) like Excel */
+.excel-roster-table th.col-row-num,
+.excel-roster-table td.col-row-num {
+    width: 38px;
+    min-width: 38px;
+    text-align: center;
+    background: #f8fafc !important;
+    color: #64748b;
+    font-weight: 700;
+    font-size: 0.72rem;
+    user-select: none;
+}
+
+/* Hover effect on rows like Excel */
+.excel-roster-table tbody tr:hover td {
+    background-color: #f1f5f9 !important;
+}
+
+.excel-roster-table tbody tr:hover td.col-row-num {
+    background-color: #e2e8f0 !important;
+    color: #0f172a;
+}
+
+/* Excel Summary Total Row (tfoot) */
+.excel-roster-table tfoot td {
+    background: #f8fafc !important;
+    border-top: 2px solid #94a3b8 !important;
+    border-bottom: 2px solid #94a3b8 !important;
+    font-weight: 700;
+    padding: 0.45rem 0.55rem;
+}
+
+/* Micro Attendance Buttons */
+.excel-att-btn-group .btn {
+    padding: 0.1rem 0.45rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+/* ==========================================================================
+   CLICK-TO-SELECT MULTI-STAFF CELL HIGHLIGHT & SELECTION
+   ========================================================================== */
+.excel-staff-cell.is-selected {
+    background-color: #dbeafe !important;
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 2px #2563eb inset, 0 2px 6px rgba(37, 99, 235, 0.25) !important;
+    color: #1e40af !important;
+    font-weight: 700;
+}
+
+.excel-staff-cell .selection-check-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    background: #2563eb;
+    color: #ffffff;
+    border-radius: 50%;
+    font-size: 0.55rem;
+    margin-right: 0.3rem;
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   FLOATING ACTION BAR FOR BATCH DEPLOYMENT (MOBILE & DESKTOP)
+   ========================================================================== */
+.matrix-floating-bar {
+    position: fixed;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%) translateY(140%);
+    background: rgba(15, 23, 42, 0.96);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #ffffff;
+    padding: 0.45rem 0.85rem;
+    border-radius: 50px;
+    box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    z-index: 1045;
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+    opacity: 0;
+    pointer-events: none;
+    max-width: 95vw;
+}
+
+.matrix-floating-bar.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+@media (min-width: 992px) {
+    .matrix-floating-bar {
+        bottom: 24px;
+        padding: 0.5rem 1.2rem;
+        box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.55), 0 0 0 1.5px rgba(255, 255, 255, 0.2);
+    }
+}
+
+#toggleMultiSelectBtn.active {
+    background-color: #2563eb !important;
+    border-color: #2563eb !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.35) !important;
+}
+
+.multi-select-active {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+}
+
+.multi-select-active .excel-staff-cell {
+    cursor: cell !important;
+}
+
+.multi-select-active .excel-staff-cell:not(.status-leave):not(.status-deployed):hover {
+    outline: 2px dashed #2563eb;
+    cursor: cell !important;
+}
+
+.matrix-floating-bar .selected-count-badge {
+    background: #2563eb;
+    color: #ffffff;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.76rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    white-space: nowrap;
+}
+
+.matrix-floating-bar .btn-deploy-batch {
+    background: #10b981;
+    color: #ffffff;
+    border: none;
+    font-weight: 700;
+    font-size: 0.76rem;
+    padding: 0.35rem 0.95rem;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.matrix-floating-bar .btn-deploy-batch:hover {
+    background: #059669;
+    color: #ffffff;
+    transform: scale(1.02);
+}
+
+.matrix-floating-bar .btn-clear-selection {
+    background: transparent;
+    color: #94a3b8;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    font-size: 0.72rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.matrix-floating-bar .btn-clear-selection:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* ==========================================================================
+   SEARCHABLE CLIENT VENUE SELECTION MODAL
+   ========================================================================== */
+.venue-select-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.55rem 0.75rem;
+    cursor: pointer;
+    background: #ffffff;
+    transition: all 0.12s ease;
+    margin-bottom: 0.45rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.venue-select-card:hover {
+    border-color: #94a3b8;
+    background: #f8fafc;
+}
+
+.venue-select-card.selected {
+    border-color: #2563eb !important;
+    background: #eff6ff !important;
+    box-shadow: 0 0 0 1.5px #2563eb;
+}
+
+.venue-select-card .venue-radio-circle {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #cbd5e1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.12s ease;
+}
+
+.venue-select-card.selected .venue-radio-circle {
+    border-color: #2563eb;
+    background: #2563eb;
+}
+
+.venue-select-card.selected .venue-radio-circle::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: #ffffff;
+    border-radius: 50%;
+}
+
+/* ==========================================================================
+   MOBILE RESPONSIVE RULES (FIX CUTOFFS ON MOBILE & TABLET)
+   ========================================================================== */
+@media (max-width: 991px) {
+    /* Reduce global padding on mobile screens */
+    .page-container {
+        padding: 0.65rem 0.5rem !important;
+    }
+    
+    .app-topbar {
+        padding: 0.5rem 0.75rem !important;
+    }
+
+    /* Deploy Page: Allow 100% full width to matrix & clients */
+    .deploy-page-view .page-container {
+        padding: 0.4rem 0.35rem 0.15rem 0.35rem !important;
+    }
+
+    .deploy-page-view .excel-deploy-layout {
+        flex-direction: column !important;
+        height: auto !important;
+        max-height: none !important;
+        min-height: auto !important;
+    }
+
+    .excel-matrix-canvas {
+        flex: 1 1 100% !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .client-panel-card {
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        margin-top: 0.65rem;
+    }
+
+    /* Mobile switcher tab visibility */
+    .client-panel-card.d-mobile-hide,
+    .excel-matrix-canvas.d-mobile-hide {
+        display: none !important;
+    }
+
+    .deploy-page-view .excel-table-scroll {
+        height: calc(100vh - 240px) !important;
+        max-height: calc(100vh - 240px) !important;
+        min-height: 380px !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .deploy-page-view .client-cards-scroll {
+        height: calc(100vh - 240px) !important;
+        max-height: calc(100vh - 240px) !important;
+        min-height: 380px !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Top Ribbon search on mobile */
+    .excel-sheet-header-bar {
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        padding: 0.4rem 0.5rem;
+    }
+
+    .legend-kpi-pill {
+        padding: 0.1rem 0.35rem;
+        font-size: 0.65rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .page-container {
+        padding: 0.4rem 0.3rem !important;
+    }
+
+    /* Daily Roster Header Bar on Mobile (Fix cutoff & wrap) */
+    .excel-roster-header-bar {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 0.5rem;
+        padding: 0.5rem 0.65rem;
+    }
+
+    .excel-roster-header-bar > div {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .excel-roster-header-bar .position-relative {
+        flex: 1 1 auto !important;
+        width: auto !important;
+        min-width: 110px;
+    }
+
+    .excel-roster-table th,
+    .excel-roster-table td {
+        padding: 0.3rem 0.4rem;
+        font-size: 0.70rem;
+    }
+
+    .excel-roster-table-scroll {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* ========================================================================== */
+/* FLATPICKR GLOBAL STYLING (DD/MM/YYYY Format & Modern Popups)               */
+/* ========================================================================== */
+.flatpickr-alt-input {
+    background-color: #ffffff !important;
+    cursor: pointer !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' class='bi bi-calendar-event' viewBox='0 0 16 16'%3E%3Cpath d='M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5z'/%3E%3Cpath d='M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.75rem center !important;
+    background-size: 1rem 1rem !important;
+    padding-right: 2.2rem !important;
+}
+
+.flatpickr-calendar {
+    font-family: inherit !important;
+    border-radius: 12px !important;
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.16), 0 4px 12px rgba(15, 23, 42, 0.08) !important;
+    border: 1px solid #e2e8f0 !important;
+    background: #ffffff !important;
+}
+
+.flatpickr-day.selected, 
+.flatpickr-day.startRange, 
+.flatpickr-day.endRange, 
+.flatpickr-day.selected.prevMonthDay, 
+.flatpickr-day.selected.nextMonthDay {
+    background: #2563eb !important;
+    border-color: #2563eb !important;
+    color: #ffffff !important;
+    font-weight: 700;
+}
+
+.flatpickr-day:hover {
+    background: #eff6ff !important;
+    border-color: #bfdbfe !important;
+}
+
+.flatpickr-day.today {
+    border-color: #2563eb !important;
+    font-weight: 700;
+}
+
+.flatpickr-months .flatpickr-month {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border-radius: 12px 12px 0 0 !important;
+}
+
+/* Status Half-Day styling */
+.excel-staff-cell.status-half-day {
+    background-color: #f59e0b !important;
+    border-color: #d97706 !important;
+    color: #ffffff !important;
+}
+.excel-staff-cell.status-half-day span:not(.badge) {
+    color: #ffffff !important;
+}
+.excel-staff-cell.status-half-day:hover {
+    background-color: #d97706 !important;
+}
+
+/* Drag & Drop Over Client Column / Shift Header Highlight */
+.excel-group-th.drag-over-client,
+td.drag-over-client,
+.excel-shift-subheading-td.drag-over-client {
+    background-color: #dbeafe !important;
+    outline: 2px dashed #2563eb !important;
+    outline-offset: -2px;
+    transition: background 0.15s ease;
+}
+
+/* Roster Floating Action Bar */
+.roster-floating-bar {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(140%);
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: #ffffff;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.45), 0 0 0 1.5px rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    z-index: 1055;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+    opacity: 0;
+    pointer-events: none;
+    max-width: 95vw;
+}
+.roster-floating-bar.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Drag & Drop Staff Swap Target Highlight */
+.excel-staff-cell.drag-swap-target {
+    outline: 2px dashed #9333ea !important;
+    background-color: #f3e8ff !important;
+    color: #581c87 !important;
+    transform: scale(1.02);
+    box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.25) !important;
+    transition: all 0.12s ease;
+}
+
+/* Shift-Wise Subheading Accordion / Collapse */
+.excel-shift-subheading-td {
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s ease;
+}
+.excel-shift-subheading-td:hover {
+    background: #cbd5e1 !important;
+}
+.shift-collapse-icon {
+    display: inline-block;
+    transition: transform 0.2s ease;
+    font-size: 0.68rem;
+}
+.shift-collapse-icon.collapsed {
+    transform: rotate(-90deg);
+}
+
+/* Keyboard Shortcut Pill & Quick Status Controls in Top Ribbon */
+.roster-quick-status-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.2rem 0.45rem;
+    transition: all 0.2s ease;
+}
+.roster-quick-status-bar.active-selection {
+    background: #eff6ff;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+.key-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #1e293b;
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 0.62rem;
+    min-width: 17px;
+    height: 17px;
+    border-radius: 4px;
+    padding: 0 3px;
+    font-family: monospace;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+.key-badge.key-p { background: #15803d; }
+.key-badge.key-h { background: #b45309; }
+.key-badge.key-a { background: #b91c1c; }
+.key-badge.key-u { background: #475569; }
+
+/* Mouse Drag-to-Select State */
+.excel-dense-table.is-drag-selecting {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    cursor: cell !important;
+}
+.excel-dense-table.is-drag-selecting .excel-staff-cell {
+    cursor: cell !important;
+}
+
+
+

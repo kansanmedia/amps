@@ -1,0 +1,18 @@
+# Sensitive environment configuration and secrets
+.env
+.env.local
+config.local.php
+
+# Uploaded documents and files
+uploads/*
+!uploads/.htaccess
+!uploads/company/
+!uploads/logos/
+!uploads/receipts/
+!uploads/staff_docs/
+
+# System and logs
+*.log
+.DS_Store
+Thumbs.db
+scratch/

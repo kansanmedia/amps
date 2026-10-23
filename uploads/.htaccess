@@ -1,0 +1,29 @@
+# uploads/.htaccess - Secure Upload Directory Guard
+# Checkpoint 4: Block any PHP, script, or executable execution inside uploads
+
+<IfModule mod_authz_core.c>
+    <FilesMatch "\.(php|phtml|php3|php4|php5|php7|php8|phar|cgi|pl|py|sh|bash|exe|jsp|asp|aspx)$">
+        Require all denied
+    </FilesMatch>
+</IfModule>
+
+<IfModule !mod_authz_core.c>
+    <FilesMatch "\.(php|phtml|php3|php4|php5|php7|php8|phar|cgi|pl|py|sh|bash|exe|jsp|asp|aspx)$">
+        Order Deny,Allow
+        Deny from all
+    </FilesMatch>
+</IfModule>
+
+# Disable Directory Browsing and Script Execution
+Options -Indexes -ExecCGI
+
+# Turn off PHP engine if mod_php is loaded
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>
