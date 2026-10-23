@@ -29,6 +29,16 @@ require_once ROOT_PATH . '/templates/navbar.php';
     document.body.classList.add('deploy-page-view');
 </script>
 
+<style>
+.excel-search-result-cell {
+    border-left: 3px solid #4f46e5 !important;
+    background-color: #fdfefe;
+}
+.excel-search-result-cell:hover {
+    background-color: #f0f4ff !important;
+}
+</style>
+
 <!-- MATRIX ROOT CONTAINER -->
 <div class="px-1 py-1">
     
@@ -104,11 +114,14 @@ require_once ROOT_PATH . '/templates/navbar.php';
             </div>
         </div>
 
-        <!-- Right Group: Clean Search Filter (Aligned & Compact) -->
+        <!-- Right Group: Clean Search Filter (Aligned & Compact with Match Counter) -->
         <div class="d-flex align-items-center gap-2 flex-nowrap ms-auto">
             <button type="button" class="btn btn-xs btn-primary active rounded-2 px-2.5 py-1 shadow-2xs text-nowrap d-flex align-items-center gap-1.5 fw-bold" id="toggleMultiSelectBtn" onclick="toggleMultiSelectMode()" style="font-size: 0.72rem; height: 28px;" title="Multi-Select Mode: Click or drag to select cells">
                 <i class="bi bi-check2-square"></i> <span id="multiSelectBtnText">Multi-Select (ON)</span>
             </button>
+            <span id="searchMatchCountBadge" class="badge bg-primary text-white rounded-2 px-2.5 py-1 shadow-2xs fw-bold text-nowrap d-none align-items-center gap-1.5" style="font-size: 0.72rem; height: 28px;" title="Total Search Matches">
+                <i class="bi bi-funnel-fill"></i> <span id="searchMatchCountNum">0</span> Found
+            </span>
             <div class="position-relative" style="width: 185px;">
                 <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-2 text-muted" style="font-size: 0.72rem; pointer-events: none;"></i>
                 <input type="text" id="staffFilterSearch" class="form-control form-control-sm ps-4 pe-4 py-1 rounded-2" placeholder="Filter staff... (Press F)" title="Press 'F' key anywhere to search staff" oninput="applyFilters()" style="font-size: 0.73rem; height: 28px;">
@@ -134,7 +147,7 @@ require_once ROOT_PATH . '/templates/navbar.php';
                     <span class="badge bg-dark text-white px-2 py-1 fw-bold d-flex align-items-center gap-1" style="font-size: 0.70rem;" id="excelStaffCountBadge">
                         <i class="bi bi-people-fill text-info"></i> <span id="kpiTotalStaff">--</span> Staff
                     </span>
-                    <span class="text-muted small d-none d-lg-inline" style="font-size: 0.70rem;">
+                    <span class="text-muted small d-none d-lg-inline" style="font-size: 0.70rem;" id="excelSearchStatusNotice">
                         <i class="bi bi-info-circle text-primary me-1"></i> Drag staff to right to deploy &bull; Drag across columns to shift group
                     </span>
                 </div>
@@ -1058,20 +1071,80 @@ function renderExcelMatrix(staffList) {
     }
 
     // Filter staff according to live search filter if active
-    const q = (document.getElementById('staffFilterSearch').value || '').toLowerCase().trim();
+    const searchInput = document.getElementById('staffFilterSearch');
+    const q = (searchInput ? searchInput.value : '').toLowerCase().trim();
     let displayList = staffList || [];
     if (q) {
         displayList = displayList.filter(s => 
-            s.name.toLowerCase().includes(q) || 
-            s.code.toLowerCase().includes(q) || 
-            s.phone.toLowerCase().includes(q) ||
-            s.category.toLowerCase().includes(q) ||
+            (s.name && s.name.toLowerCase().includes(q)) || 
+            (s.code && s.code.toLowerCase().includes(q)) || 
+            (s.phone && s.phone.toLowerCase().includes(q)) ||
+            (s.category && s.category.toLowerCase().includes(q)) ||
             (s.group && s.group.toLowerCase().includes(q))
         );
     }
 
+    // Update Live Search Match Count Badges & Status Notice
+    const countBadge = document.getElementById('searchMatchCountBadge');
+    const countNum = document.getElementById('searchMatchCountNum');
+    const totalStaffCount = staffList ? staffList.length : 0;
+    const staffBadge = document.getElementById('excelStaffCountBadge');
+    const statusNotice = document.getElementById('excelSearchStatusNotice');
+
+    if (q) {
+        if (countBadge && countNum) {
+            countBadge.classList.remove('d-none');
+            countBadge.classList.add('d-inline-flex');
+            countNum.innerText = displayList.length;
+            if (displayList.length === 0) {
+                countBadge.className = 'badge bg-danger text-white rounded-2 px-2.5 py-1 shadow-2xs fw-bold text-nowrap d-inline-flex align-items-center gap-1.5';
+            } else {
+                countBadge.className = 'badge bg-primary text-white rounded-2 px-2.5 py-1 shadow-2xs fw-bold text-nowrap d-inline-flex align-items-center gap-1.5';
+            }
+        }
+        if (staffBadge) {
+            staffBadge.innerHTML = `<i class="bi bi-search text-warning"></i> <span>${displayList.length}</span> Matches`;
+        }
+        if (statusNotice) {
+            statusNotice.innerHTML = `<span class="text-primary fw-semibold"><i class="bi bi-funnel-fill me-1"></i>Found <strong>${displayList.length}</strong> staff matching "<strong>${escapeHtml(q)}</strong>" in 1 place. <a href="javascript:void(0)" onclick="clearStaffSearch()" class="ms-1 text-danger fw-bold text-decoration-underline">Clear Search (Show All)</a></span>`;
+        }
+    } else {
+        if (countBadge) {
+            countBadge.classList.remove('d-inline-flex');
+            countBadge.classList.add('d-none');
+        }
+        if (staffBadge) {
+            staffBadge.innerHTML = `<i class="bi bi-people-fill text-info"></i> <span id="kpiTotalStaff">${totalStaffCount}</span> Staff`;
+        }
+        if (statusNotice) {
+            statusNotice.innerHTML = `<i class="bi bi-info-circle text-primary me-1"></i> Drag staff to right to deploy &bull; Drag across columns to shift group`;
+        }
+    }
+
+    // Empty state if query returned 0 matches
+    if (q && displayList.length === 0) {
+        theadRow.innerHTML = `
+            <th class="excel-group-th text-center py-2" style="background:#fee2e2 !important; color:#991b1b !important;">
+                <i class="bi bi-search me-1"></i> 0 Matches Found
+            </th>
+        `;
+        tbody.innerHTML = `
+            <tr>
+                <td class="text-center py-5 bg-white">
+                    <div class="text-danger mb-2" style="font-size: 2.2rem;"><i class="bi bi-person-x-fill"></i></div>
+                    <h6 class="fw-bold text-dark mb-1">No staff members found matching "${escapeHtml(q)}"</h6>
+                    <p class="text-muted small mb-3">0 staff found out of ${totalStaffCount} total staff. Check spelling or try a different keyword.</p>
+                    <button type="button" class="btn btn-sm btn-outline-primary px-3 py-1.5 fw-semibold rounded-2" onclick="clearStaffSearch()">
+                        <i class="bi bi-x-circle me-1"></i> Clear Search Filter (Show All)
+                    </button>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
     // Map staff into groups (excluding GENERAL POOL)
-    const activeGroupNames = activeGroupsList
+    let activeGroupNames = activeGroupsList
         .map(g => g.group_name.toUpperCase())
         .filter(g => g !== 'GENERAL POOL');
 
@@ -1091,8 +1164,34 @@ function renderExcelMatrix(staffList) {
         }
     });
 
-    // Generate Excel Header row with RED BOLD GROUP NAMES & COUNT BADGES (No truncation, nowrap)
+    // When searching: ONLY show groups that have matching staff (hide all 0-count columns so user never has to slide horizontally!)
+    if (q) {
+        activeGroupNames = activeGroupNames.filter(gn => (groupsMap[gn] || []).length > 0);
+    }
+
+    // Generate Excel Header row
     let thHtml = '';
+
+    // If searching, add unified Column 0: "🎯 ALL SEARCH RESULTS (${displayList.length})"
+    if (q) {
+        thHtml += `
+            <th class="excel-group-th" 
+                style="background: #eef2ff !important; border-bottom: 2.5px solid #4f46e5 !important; min-width: 195px;" 
+                title="All ${displayList.length} search matches in 1 place. Click 'Select All' to select them all at once.">
+                <div class="d-flex align-items-center justify-content-between px-1 flex-nowrap">
+                    <div class="d-flex align-items-center gap-1 cursor-pointer" onclick="selectAllSearchMatches()" style="cursor: pointer;" title="Click to select/deselect all search matches">
+                        <i class="bi bi-search text-primary fw-bold" style="font-size:0.75rem;"></i>
+                        <span class="fw-bold text-primary" style="font-size: 0.74rem; letter-spacing: 0.3px;">ALL SEARCH RESULTS</span>
+                        <span class="badge bg-primary text-white rounded-pill px-1.5 py-0.5" style="font-size: 0.65rem;">${displayList.length}</span>
+                    </div>
+                    <button type="button" class="btn btn-xs btn-outline-primary py-0 px-1.5 fw-bold rounded-1" onclick="selectAllSearchMatches()" title="Select/Deselect All Matches" style="font-size: 0.62rem; height: 20px;">
+                        Select All
+                    </button>
+                </div>
+            </th>
+        `;
+    }
+
     activeGroupNames.forEach(grpName => {
         const count = (groupsMap[grpName] || []).length;
         thHtml += `
@@ -1114,26 +1213,38 @@ function renderExcelMatrix(staffList) {
     });
     theadRow.innerHTML = thHtml;
 
-    // Calculate row count needed (at least 15 rows for authentic dense Excel look)
+    // Calculate row count needed
     let maxStaffInAnyGroup = 0;
     activeGroupNames.forEach(grpName => {
         const len = groupsMap[grpName].length;
         if (len > maxStaffInAnyGroup) maxStaffInAnyGroup = len;
     });
-    const totalRows = Math.max(maxStaffInAnyGroup + 2, 14);
 
-    // Build rows: EVERY cell (occupied or empty) is a drop target to switch group!
+    const maxRowsRequired = q ? Math.max(displayList.length, maxStaffInAnyGroup) : maxStaffInAnyGroup;
+    const totalRows = Math.max(maxRowsRequired + (q ? 1 : 2), (q ? 8 : 14));
+
+    // Build rows
     let rowsHtml = '';
     for (let r = 0; r < totalRows; r++) {
         rowsHtml += '<tr>';
+        
+        // If searching: Render Column 0 (Unified All Search Matches)
+        if (q) {
+            if (r < displayList.length) {
+                const stf = displayList[r];
+                rowsHtml += renderStaffCellHtml(stf, stf.group || 'GENERAL POOL', true);
+            } else {
+                rowsHtml += `<td class="excel-empty-cell" style="background: #fafafa;"></td>`;
+            }
+        }
+
         for (let c = 0; c < activeGroupNames.length; c++) {
             const grpName = activeGroupNames[c];
             const grpStaff = groupsMap[grpName];
             if (r < grpStaff.length) {
                 const stf = grpStaff[r];
-                rowsHtml += renderStaffCellHtml(stf, grpName);
+                rowsHtml += renderStaffCellHtml(stf, grpName, false);
             } else {
-                // Empty Excel cell: clickable to quick-add staff member to this group & droppable to shift!
                 rowsHtml += `
                     <td class="excel-empty-cell" 
                         data-group="${escapeHtml(grpName)}"
@@ -1153,7 +1264,7 @@ function renderExcelMatrix(staffList) {
 }
 
 // Helper to render individual Excel staff cell
-function renderStaffCellHtml(stf, grpName) {
+function renderStaffCellHtml(stf, grpName, isUnifiedSearchCol = false) {
     const isLeave = stf.is_on_leave;
     const isDeployed = stf.is_deployed;
     const isSelected = selectedStaffIds.has(stf.id);
@@ -1212,6 +1323,8 @@ function renderStaffCellHtml(stf, grpName) {
     }
 
     const checkIcon = isSelected ? '<span class="selection-check-icon"><i class="bi bi-check-lg"></i></span>' : '';
+    const cellId = isUnifiedSearchCol ? `search-cell-staff-${stf.id}` : `cell-staff-${stf.id}`;
+    const groupPill = isUnifiedSearchCol ? `<span class="badge bg-dark bg-opacity-10 text-dark border px-1 ms-1 text-truncate" style="font-size:0.58rem; max-width:85px;" title="Group: ${escapeHtml(targetGroup)}">${escapeHtml(targetGroup)}</span>` : '';
 
     return `
         <td class="excel-staff-td" 
@@ -1219,8 +1332,8 @@ function renderStaffCellHtml(stf, grpName) {
             ondragover="handleGroupDragOver(event)" 
             ondragleave="handleGroupDragLeave(event)" 
             ondrop="handleGroupDrop(event, '${escapeHtml(targetGroup)}')">
-            <div class="excel-staff-cell ${statusClass}" 
-                 id="cell-staff-${stf.id}"
+            <div class="excel-staff-cell ${statusClass} ${isUnifiedSearchCol ? 'excel-search-result-cell' : ''}" 
+                 id="${cellId}"
                  style="${customStyle}"
                  data-staff-id="${stf.id}"
                  data-staff-group="${escapeHtml(targetGroup)}"
@@ -1235,6 +1348,7 @@ function renderStaffCellHtml(stf, grpName) {
                  oncontextmenu="handleCellContextMenu(event, ${stf.id})">
                 ${checkIcon}
                 <span class="text-truncate flex-grow-1" style="color: inherit !important;">${escapeHtml(stf.name)}</span>
+                ${groupPill}
                 ${iconBadge}
             </div>
         </td>
@@ -2223,6 +2337,38 @@ function applyFilters() {
     renderExcelMatrix(matrixData.staff);
 }
 
+// Select or Deselect all currently matching staff in search results
+function selectAllSearchMatches() {
+    const searchInput = document.getElementById('staffFilterSearch');
+    const q = (searchInput ? searchInput.value : '').toLowerCase().trim();
+    if (!q || !matrixData.staff) return;
+
+    const matched = matrixData.staff.filter(s => 
+        !s.is_on_leave && !s.is_deployed && (
+            (s.name && s.name.toLowerCase().includes(q)) || 
+            (s.code && s.code.toLowerCase().includes(q)) || 
+            (s.phone && s.phone.toLowerCase().includes(q)) ||
+            (s.category && s.category.toLowerCase().includes(q)) ||
+            (s.group && s.group.toLowerCase().includes(q))
+        )
+    );
+
+    if (matched.length === 0) {
+        showToast('No ready staff to select in search results.', 'warning');
+        return;
+    }
+
+    const allSelected = matched.every(s => selectedStaffIds.has(s.id));
+    if (allSelected) {
+        matched.forEach(s => unselectStaff(s.id));
+        showToast(`Deselected ${matched.length} search matches.`, 'secondary');
+    } else {
+        matched.forEach(s => selectStaff(s.id));
+        showToast(`Selected all ${matched.length} ready search matches!`, 'success');
+    }
+    updateFloatingBar();
+}
+
 // 14. Toast Notification
 function showToast(msg, type = 'primary') {
     const toastEl = document.getElementById('matrixToast');
@@ -2435,11 +2581,10 @@ function handleRangeSelection(fromId, toId) {
     showToast(`Selected ${selectedStaffIds.size} staff`, 'info');
 }
 
-// Select an individual staff member
+// Select an individual staff member (syncs across all visible column cells)
 function selectStaff(staffId) {
     selectedStaffIds.add(staffId);
-    const cell = document.getElementById(`cell-staff-${staffId}`);
-    if (cell) {
+    document.querySelectorAll(`.excel-staff-cell[data-staff-id="${staffId}"]`).forEach(cell => {
         cell.classList.add('is-selected');
         if (!cell.querySelector('.selection-check-icon')) {
             const icon = document.createElement('span');
@@ -2447,18 +2592,17 @@ function selectStaff(staffId) {
             icon.innerHTML = '<i class="bi bi-check-lg"></i>';
             cell.insertBefore(icon, cell.firstChild);
         }
-    }
+    });
 }
 
-// Unselect an individual staff member
+// Unselect an individual staff member (syncs across all visible column cells)
 function unselectStaff(staffId) {
     selectedStaffIds.delete(staffId);
-    const cell = document.getElementById(`cell-staff-${staffId}`);
-    if (cell) {
+    document.querySelectorAll(`.excel-staff-cell[data-staff-id="${staffId}"]`).forEach(cell => {
         cell.classList.remove('is-selected');
         const icon = cell.querySelector('.selection-check-icon');
         if (icon) icon.remove();
-    }
+    });
 }
 
 // Toggle individual staff selection state
